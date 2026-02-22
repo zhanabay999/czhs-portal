@@ -4,10 +4,9 @@ import { Link } from "@/i18n/routing";
 import { db } from "@/db";
 import { newsArticles, newsCategories } from "@/db/schema";
 import { desc, eq, like, and, or, sql } from "drizzle-orm";
-import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Newspaper, ChevronLeft, ChevronRight } from "lucide-react";
+import { Newspaper, ChevronLeft, ChevronRight, Clock } from "lucide-react";
 
 type Props = {
   params: Promise<{ locale: string }>;
@@ -82,9 +81,7 @@ export default async function NewsPage({ params, searchParams }: Props) {
       .orderBy(desc(newsArticles.isPinned), desc(newsArticles.publishedAt))
       .limit(ITEMS_PER_PAGE)
       .offset((page - 1) * ITEMS_PER_PAGE);
-  } catch {
-    // DB not ready
-  }
+  } catch {}
 
   const totalPages = Math.ceil(totalCount / ITEMS_PER_PAGE);
 
@@ -132,119 +129,131 @@ function NewsContent({
 }) {
   const t = useTranslations("news");
 
-  return (
-    <div className="container mx-auto px-4 py-8">
-      {/* Page Header */}
-      <div className="mb-8">
-        <h1 className="mb-2 text-3xl font-bold text-[#003DA5]">{t("title")}</h1>
-        <div className="h-1 w-20 rounded bg-[#C8A951]" />
-      </div>
+  const formatDate = (date: Date | null) => {
+    if (!date) return "";
+    return new Date(date).toLocaleDateString(
+      locale === "kk" ? "kk-KZ" : "ru-RU",
+      { year: "numeric", month: "long", day: "numeric" }
+    );
+  };
 
-      {/* Category Filters */}
-      {categories.length > 0 && (
-        <div className="mb-6 flex flex-wrap gap-2">
-          <Link href="/news">
-            <Badge variant={!currentCategory ? "default" : "outline"} className="cursor-pointer">
-              {t("allCategories")}
-            </Badge>
-          </Link>
-          {categories.map((cat) => (
-            <Link key={cat.id} href={`/news?category=${cat.id}`}>
+  return (
+    <div className="bg-white">
+      <div className="container mx-auto px-4 py-8">
+        {/* Page Header */}
+        <div className="mb-6 border-b-2 border-[#003DA5] pb-3">
+          <h1 className="text-2xl font-bold text-[#003DA5]">{t("title")}</h1>
+        </div>
+
+        {/* Category Filters */}
+        {categories.length > 0 && (
+          <div className="mb-6 flex flex-wrap gap-2">
+            <Link href="/news">
               <Badge
-                variant={currentCategory === cat.id ? "default" : "outline"}
-                className="cursor-pointer"
+                variant={!currentCategory ? "default" : "outline"}
+                className={`cursor-pointer px-3 py-1 ${!currentCategory ? "bg-[#003DA5]" : ""}`}
               >
-                {isKk ? cat.nameKk : cat.nameRu}
+                {t("allCategories")}
               </Badge>
             </Link>
-          ))}
-        </div>
-      )}
+            {categories.map((cat) => (
+              <Link key={cat.id} href={`/news?category=${cat.id}`}>
+                <Badge
+                  variant={currentCategory === cat.id ? "default" : "outline"}
+                  className={`cursor-pointer px-3 py-1 ${currentCategory === cat.id ? "bg-[#003DA5]" : ""}`}
+                >
+                  {isKk ? cat.nameKk : cat.nameRu}
+                </Badge>
+              </Link>
+            ))}
+          </div>
+        )}
 
-      {/* News Grid */}
-      {articles.length > 0 ? (
-        <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {articles.map((article) => (
-            <Link key={article.id} href={`/news/${article.slug}`}>
-              <Card className="group h-full cursor-pointer overflow-hidden border-0 shadow-sm transition-all hover:-translate-y-1 hover:shadow-lg">
-                <div className="relative h-48 overflow-hidden bg-gradient-to-br from-[#003DA5] to-[#0066CC]">
-                  {article.coverImageUrl ? (
-                    <img
-                      src={article.coverImageUrl}
-                      alt={isKk ? article.titleKk : article.titleRu}
-                      className="h-full w-full object-cover transition-transform group-hover:scale-105"
-                    />
-                  ) : (
-                    <div className="flex h-full items-center justify-center">
-                      <Newspaper className="h-12 w-12 text-white/30" />
+        {/* News Grid */}
+        {articles.length > 0 ? (
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {articles.map((article) => (
+              <Link key={article.id} href={`/news/${article.slug}`} className="group">
+                <article className="h-full overflow-hidden rounded-lg border border-gray-200 transition-all hover:shadow-md">
+                  <div className="relative aspect-[16/10] overflow-hidden bg-gray-100">
+                    {article.coverImageUrl ? (
+                      <img
+                        src={article.coverImageUrl}
+                        alt={isKk ? article.titleKk : article.titleRu}
+                        className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+                      />
+                    ) : (
+                      <div className="flex h-full items-center justify-center bg-gradient-to-br from-[#003DA5]/80 to-[#0066CC]/80">
+                        <Newspaper className="h-10 w-10 text-white/30" />
+                      </div>
+                    )}
+                    {article.isPinned && (
+                      <span className="absolute left-3 top-3 rounded bg-[#C8A951] px-2 py-1 text-xs font-bold text-white">
+                        {t("featured")}
+                      </span>
+                    )}
+                  </div>
+                  <div className="p-4">
+                    <div className="flex items-center gap-3 text-xs text-gray-400">
+                      <span className="flex items-center gap-1">
+                        <Clock className="h-3 w-3" />
+                        {formatDate(article.publishedAt)}
+                      </span>
+                      <span>{article.viewCount} {t("views")}</span>
                     </div>
-                  )}
-                  {article.isPinned && (
-                    <Badge className="absolute left-3 top-3 bg-[#C8A951] text-[#1A1A2E]">
-                      {t("featured")}
-                    </Badge>
-                  )}
-                </div>
-                <CardContent className="p-5">
-                  {article.publishedAt && (
-                    <p className="mb-2 text-xs text-muted-foreground">
-                      {new Date(article.publishedAt).toLocaleDateString(
-                        locale === "kk" ? "kk-KZ" : "ru-RU",
-                        { year: "numeric", month: "long", day: "numeric" }
-                      )}
-                    </p>
-                  )}
-                  <h3 className="mb-2 line-clamp-2 font-semibold leading-tight transition-colors group-hover:text-[#003DA5]">
-                    {isKk ? article.titleKk : article.titleRu}
-                  </h3>
-                  {(isKk ? article.excerptKk : article.excerptRu) && (
-                    <p className="line-clamp-2 text-sm text-muted-foreground">
-                      {isKk ? article.excerptKk : article.excerptRu}
-                    </p>
-                  )}
-                </CardContent>
-              </Card>
-            </Link>
-          ))}
-        </div>
-      ) : (
-        <div className="rounded-lg border border-dashed border-gray-300 p-12 text-center">
-          <Newspaper className="mx-auto mb-4 h-12 w-12 text-gray-300" />
-          <p className="text-muted-foreground">{t("noNews")}</p>
-        </div>
-      )}
+                    <h3 className="mt-2 line-clamp-2 text-sm font-bold leading-snug text-gray-800 transition-colors group-hover:text-[#003DA5]">
+                      {isKk ? article.titleKk : article.titleRu}
+                    </h3>
+                    {(isKk ? article.excerptKk : article.excerptRu) && (
+                      <p className="mt-2 line-clamp-2 text-xs leading-relaxed text-gray-500">
+                        {isKk ? article.excerptKk : article.excerptRu}
+                      </p>
+                    )}
+                  </div>
+                </article>
+              </Link>
+            ))}
+          </div>
+        ) : (
+          <div className="rounded-lg border border-dashed border-gray-300 p-12 text-center">
+            <Newspaper className="mx-auto mb-4 h-12 w-12 text-gray-300" />
+            <p className="text-gray-500">{t("noNews")}</p>
+          </div>
+        )}
 
-      {/* Pagination */}
-      {totalPages > 1 && (
-        <div className="mt-8 flex items-center justify-center gap-2">
-          {page > 1 && (
-            <Button asChild variant="outline" size="sm">
-              <Link href={`/news?page=${page - 1}${currentCategory ? `&category=${currentCategory}` : ""}`}>
-                <ChevronLeft className="h-4 w-4" />
-              </Link>
-            </Button>
-          )}
-          {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
-            <Button
-              key={p}
-              asChild
-              variant={p === page ? "default" : "outline"}
-              size="sm"
-            >
-              <Link href={`/news?page=${p}${currentCategory ? `&category=${currentCategory}` : ""}`}>
-                {p}
-              </Link>
-            </Button>
-          ))}
-          {page < totalPages && (
-            <Button asChild variant="outline" size="sm">
-              <Link href={`/news?page=${page + 1}${currentCategory ? `&category=${currentCategory}` : ""}`}>
-                <ChevronRight className="h-4 w-4" />
-              </Link>
-            </Button>
-          )}
-        </div>
-      )}
+        {/* Pagination */}
+        {totalPages > 1 && (
+          <div className="mt-8 flex items-center justify-center gap-2">
+            {page > 1 && (
+              <Button asChild variant="outline" size="sm">
+                <Link href={`/news?page=${page - 1}${currentCategory ? `&category=${currentCategory}` : ""}`}>
+                  <ChevronLeft className="h-4 w-4" />
+                </Link>
+              </Button>
+            )}
+            {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
+              <Button
+                key={p}
+                asChild
+                variant={p === page ? "default" : "outline"}
+                size="sm"
+                className={p === page ? "bg-[#003DA5]" : ""}
+              >
+                <Link href={`/news?page=${p}${currentCategory ? `&category=${currentCategory}` : ""}`}>
+                  {p}
+                </Link>
+              </Button>
+            ))}
+            {page < totalPages && (
+              <Button asChild variant="outline" size="sm">
+                <Link href={`/news?page=${page + 1}${currentCategory ? `&category=${currentCategory}` : ""}`}>
+                  <ChevronRight className="h-4 w-4" />
+                </Link>
+              </Button>
+            )}
+          </div>
+        )}
+      </div>
     </div>
   );
 }

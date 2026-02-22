@@ -8,10 +8,11 @@ import {
   Train,
   Menu,
   X,
-  ChevronDown,
   Globe,
   LogIn,
   User,
+  ChevronDown,
+  Search,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -49,28 +50,32 @@ export function Header() {
   const { data: session } = useSession();
 
   const otherLocale = locale === "kk" ? "ru" : "kk";
+  const otherLocaleName = locale === "kk" ? "Русский" : "Қазақша";
 
   return (
-    <header className="sticky top-0 z-50 border-b border-border bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/80">
-      {/* Top bar */}
-      <div className="bg-[#003DA5] text-white">
-        <div className="container mx-auto flex items-center justify-between px-4 py-1.5 text-sm">
-          <span className="hidden sm:inline">{tc("companyName")}</span>
-          <div className="flex items-center gap-4">
+    <header className="sticky top-0 z-50">
+      {/* Top utility bar */}
+      <div className="border-b border-[#002D7A] bg-[#003DA5] text-white">
+        <div className="container mx-auto flex items-center justify-between px-4 py-2">
+          <div className="flex items-center gap-6 text-sm">
+            <span className="hidden text-blue-200 sm:inline">{tc("companyName")}</span>
+          </div>
+          <div className="flex items-center gap-4 text-sm">
             <Link
               href={pathname}
               locale={otherLocale}
-              className="flex items-center gap-1 transition-colors hover:text-[#C8A951]"
+              className="flex items-center gap-1.5 rounded px-2 py-1 font-medium transition-colors hover:bg-white/10"
             >
               <Globe className="h-3.5 w-3.5" />
-              <span className="uppercase">{otherLocale}</span>
+              {otherLocaleName}
             </Link>
+            <div className="h-4 w-px bg-white/20" />
             {session ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <button className="flex items-center gap-1 transition-colors hover:text-[#C8A951]">
+                  <button className="flex items-center gap-1.5 rounded px-2 py-1 font-medium transition-colors hover:bg-white/10">
                     <User className="h-3.5 w-3.5" />
-                    <span>{session.user.name}</span>
+                    <span className="hidden sm:inline">{session.user.name}</span>
                     <ChevronDown className="h-3 w-3" />
                   </button>
                 </DropdownMenuTrigger>
@@ -98,71 +103,56 @@ export function Header() {
             ) : (
               <Link
                 href="/login"
-                className="flex items-center gap-1 transition-colors hover:text-[#C8A951]"
+                className="flex items-center gap-1.5 rounded px-2 py-1 font-medium transition-colors hover:bg-white/10"
               >
                 <LogIn className="h-3.5 w-3.5" />
-                <span>{tc("login")}</span>
+                {tc("login")}
               </Link>
             )}
           </div>
         </div>
       </div>
 
-      {/* Main nav */}
-      <div className="container mx-auto px-4">
-        <div className="flex h-16 items-center justify-between">
+      {/* Logo + Site Name bar */}
+      <div className="border-b border-gray-200 bg-white">
+        <div className="container mx-auto flex items-center justify-between px-4">
           <Link href="/" className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-[#003DA5]">
-              <Train className="h-6 w-6 text-white" />
-            </div>
-            <div className="hidden sm:block">
-              <p className="text-lg font-bold leading-tight text-[#003DA5]">
-                {tc("appName")}
-              </p>
-              <p className="text-xs text-muted-foreground">
+            <img
+              src={locale === "kk" ? "/logo-kk.png" : "/logo-ru.png"}
+              alt={locale === "kk" ? "ҚТЖ" : "КТЖ"}
+              className="h-[80px] w-auto object-contain"
+            />
+            <div>
+              <h1 className="text-sm font-bold leading-tight text-[#003DA5] sm:text-lg">
                 {tc("appFullName")}
+              </h1>
+              <p className="hidden text-xs text-gray-500 sm:block">
+                {locale === "kk" ? "Ақпараттық портал" : "Информационный портал"}
               </p>
             </div>
           </Link>
 
-          {/* Desktop nav */}
-          <nav className="hidden items-center gap-1 lg:flex">
-            {navItems.map((item) => (
-              <Link
-                key={item.key}
-                href={item.href}
-                className={`rounded-md px-3 py-2 text-sm font-medium transition-colors hover:bg-secondary hover:text-[#003DA5] ${
-                  pathname === item.href
-                    ? "bg-secondary text-[#003DA5]"
-                    : "text-foreground"
-                }`}
-              >
-                {t(item.key)}
-              </Link>
-            ))}
-          </nav>
-
-          {/* Mobile nav trigger */}
+          {/* Mobile menu trigger */}
           <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
             <SheetTrigger asChild className="lg:hidden">
-              <Button variant="ghost" size="icon">
-                <Menu className="h-6 w-6" />
+              <Button variant="outline" size="icon">
+                <Menu className="h-5 w-5" />
               </Button>
             </SheetTrigger>
             <SheetContent side="right" className="w-80">
               <SheetTitle className="text-[#003DA5]">
-                {tc("appName")}
+                {tc("appFullName")}
               </SheetTitle>
-              <nav className="mt-6 flex flex-col gap-2">
+              <nav className="mt-6 flex flex-col gap-1">
                 {navItems.map((item) => (
                   <Link
                     key={item.key}
                     href={item.href}
                     onClick={() => setMobileOpen(false)}
-                    className={`rounded-md px-4 py-3 text-sm font-medium transition-colors hover:bg-secondary ${
+                    className={`rounded-md px-4 py-3 text-sm font-medium transition-colors hover:bg-gray-100 ${
                       pathname === item.href
-                        ? "bg-secondary text-[#003DA5]"
-                        : "text-foreground"
+                        ? "bg-[#003DA5]/10 font-semibold text-[#003DA5]"
+                        : "text-gray-700"
                     }`}
                   >
                     {t(item.key)}
@@ -173,6 +163,31 @@ export function Header() {
           </Sheet>
         </div>
       </div>
+
+      {/* Main navigation bar */}
+      <nav className="hidden border-b border-gray-200 bg-gray-50 lg:block">
+        <div className="container mx-auto px-4">
+          <ul className="flex items-center gap-0">
+            {navItems.map((item) => (
+              <li key={item.key}>
+                <Link
+                  href={item.href}
+                  className={`relative block px-4 py-3 text-sm font-medium transition-colors hover:text-[#003DA5] ${
+                    pathname === item.href
+                      ? "text-[#003DA5]"
+                      : "text-gray-600"
+                  }`}
+                >
+                  {t(item.key)}
+                  {pathname === item.href && (
+                    <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#003DA5]" />
+                  )}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </nav>
     </header>
   );
 }

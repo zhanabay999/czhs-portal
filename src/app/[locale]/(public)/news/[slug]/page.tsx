@@ -134,8 +134,9 @@ function ArticleContent({
       </h1>
 
       {/* Content */}
-      <div
-        className="prose prose-lg max-w-none prose-headings:text-[#003DA5] prose-a:text-[#0066CC]"
+      <article
+        className="prose prose-lg max-w-none prose-headings:text-[#003DA5] prose-a:text-[#0066CC] prose-p:leading-relaxed"
+        lang={isKk ? "kk" : "ru"}
         dangerouslySetInnerHTML={{
           __html: isKk ? article.contentKk : article.contentRu,
         }}

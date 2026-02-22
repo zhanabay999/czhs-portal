@@ -88,9 +88,8 @@ function SportsContent({ locale, isKk, upcoming, past }: {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <div className="mb-8">
-        <h1 className="mb-2 text-3xl font-bold text-[#003DA5]">{t("title")}</h1>
-        <div className="h-1 w-20 rounded bg-[#C8A951]" />
+      <div className="mb-6 border-b-2 border-[#003DA5] pb-3">
+        <h1 className="text-2xl font-bold text-[#003DA5]">{t("title")}</h1>
       </div>
 
       {upcoming.length > 0 && (

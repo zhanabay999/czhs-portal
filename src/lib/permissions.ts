@@ -77,13 +77,6 @@ export const ADMIN_NAV_ITEMS = [
     superAdminOnly: false,
   },
   {
-    title: "vacancies",
-    href: "/admin/vacancies",
-    permission: "vacancy:read",
-    icon: "Briefcase",
-    superAdminOnly: false,
-  },
-  {
     title: "summerCamp",
     href: "/admin/summer-camp",
     permission: "camp:read",

@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -11,9 +11,11 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ArrowLeft, Loader2, Save } from "lucide-react";
 import { toast } from "sonner";
 import Link from "next/link";
+import { useAdminLocale } from "@/components/providers/AdminLocaleProvider";
 
 export default function NewFAQPage() {
   const router = useRouter();
+  const { t } = useAdminLocale();
   const [isPending, startTransition] = useTransition();
   const [questionKk, setQuestionKk] = useState("");
   const [questionRu, setQuestionRu] = useState("");
@@ -22,7 +24,7 @@ export default function NewFAQPage() {
 
   const handleSubmit = (status: "draft" | "published") => {
     if (!questionKk || !questionRu || !answerKk || !answerRu) {
-      toast.error("Барлық өрістерді толтырыңыз");
+      toast.error(t("faqForm.required"));
       return;
     }
     startTransition(async () => {
@@ -33,13 +35,13 @@ export default function NewFAQPage() {
           body: JSON.stringify({ questionKk, questionRu, answerKk, answerRu, status }),
         });
         if (res.ok) {
-          toast.success("FAQ сәтті сақталды");
+          toast.success(t("faqForm.success"));
           router.push("/admin/faq");
         } else {
-          toast.error("Қате");
+          toast.error(t("faqForm.error"));
         }
       } catch {
-        toast.error("Қате");
+        toast.error(t("faqForm.error"));
       }
     });
   };
@@ -50,33 +52,33 @@ export default function NewFAQPage() {
         <Button asChild variant="ghost" size="icon">
           <Link href="/admin/faq"><ArrowLeft className="h-5 w-5" /></Link>
         </Button>
-        <h1 className="text-2xl font-bold text-[#003DA5]">Жаңа сұрақ</h1>
+        <h1 className="text-2xl font-bold text-[#003DA5]">{t("faqForm.title")}</h1>
       </div>
 
       <Card>
         <CardContent className="p-6">
           <Tabs defaultValue="kk">
             <TabsList className="mb-4">
-              <TabsTrigger value="kk">Қазақша</TabsTrigger>
-              <TabsTrigger value="ru">Русский</TabsTrigger>
+              <TabsTrigger value="kk">{t("common.tabKk")}</TabsTrigger>
+              <TabsTrigger value="ru">{t("common.tabRu")}</TabsTrigger>
             </TabsList>
             <TabsContent value="kk" className="space-y-4">
               <div>
-                <Label>Сұрақ (ҚАЗ) *</Label>
+                <Label>{t("faqForm.questionKk")}</Label>
                 <Input value={questionKk} onChange={(e) => setQuestionKk(e.target.value)} />
               </div>
               <div>
-                <Label>Жауап (ҚАЗ) *</Label>
+                <Label>{t("faqForm.answerKk")}</Label>
                 <Textarea value={answerKk} onChange={(e) => setAnswerKk(e.target.value)} rows={6} />
               </div>
             </TabsContent>
             <TabsContent value="ru" className="space-y-4">
               <div>
-                <Label>Вопрос (РУС) *</Label>
+                <Label>{t("faqForm.questionRu")}</Label>
                 <Input value={questionRu} onChange={(e) => setQuestionRu(e.target.value)} />
               </div>
               <div>
-                <Label>Ответ (РУС) *</Label>
+                <Label>{t("faqForm.answerRu")}</Label>
                 <Textarea value={answerRu} onChange={(e) => setAnswerRu(e.target.value)} rows={6} />
               </div>
             </TabsContent>
@@ -84,12 +86,12 @@ export default function NewFAQPage() {
 
           <div className="mt-6 flex gap-3">
             <Button onClick={() => handleSubmit("draft")} variant="outline" disabled={isPending}>
-              Жоба ретінде сақтау
+              {t("faqForm.saveDraft")}
             </Button>
             <Button onClick={() => handleSubmit("published")} className="bg-[#003DA5]" disabled={isPending}>
               {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
               <Save className="mr-2 h-4 w-4" />
-              Жариялау
+              {t("faqForm.publish")}
             </Button>
           </div>
         </CardContent>

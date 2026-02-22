@@ -1,7 +1,7 @@
 {
   "common": {
     "appName": "ЦЖС Порталы",
-    "appFullName": "Магистральдық желі дирекциясы",
+    "appFullName": "«ҚТЖ» ҰК» АҚ Инфрақұрылымның ұлттық операторы",
     "companyName": "\"ҚТЖ\" ҰК\" АҚ",
     "login": "Кіру",
     "logout": "Шығу",
@@ -141,9 +141,25 @@
     "employeeId": "Табельдік нөмір",
     "rememberMe": "Мені есте сақтау",
     "forgotPassword": "Құпия сөзді ұмыттыңыз ба?",
-    "invalidCredentials": "Қате электрондық пошта немесе құпия сөз",
+    "invalidCredentials": "Қате табельдік нөмір немесе құпия сөз",
     "accountDisabled": "Тіркелгіңіз өшірілген",
-    "loginSuccess": "Сәтті кірдіңіз"
+    "loginSuccess": "Сәтті кірдіңіз",
+    "registerTitle": "Тіркелу",
+    "lastName": "Тегі",
+    "firstName": "Аты",
+    "patronymic": "Әкесінің аты",
+    "consent": "Жеке деректерді өңдеуге келісім беремін",
+    "registerButton": "Тіркелу",
+    "alreadyHaveAccount": "Тіркелгіңіз бар ма?",
+    "noAccount": "Тіркелгіңіз жоқ па?",
+    "loginLink": "Кіру",
+    "registerLink": "Тіркелу",
+    "registerSuccess": "Тіркелу өтінімі жіберілді. Әкімшінің мақұлдауын күтіңіз.",
+    "accountPending": "Сіздің өтінішіңіз қарастырылуда",
+    "employeeIdTaken": "Бұл табельдік нөмір бұрын тіркелген",
+    "required": "Барлық міндетті өрістерді толтырыңыз",
+    "invalidEmployeeId": "Табельдік нөмір форматы дұрыс емес",
+    "passwordTooShort": "Құпия сөз кемінде 4 таңбадан тұруы керек"
   },
   "portal": {
     "title": "Қызметкер порталы",

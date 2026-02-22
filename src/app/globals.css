@@ -109,6 +109,58 @@
   background: #0066CC;
 }
 
+/* News article content styles */
+.prose p {
+  margin-bottom: 1rem;
+  line-height: 1.8;
+}
+.prose h2 {
+  margin-top: 2rem;
+  margin-bottom: 1rem;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #003DA5;
+}
+.prose h3 {
+  margin-top: 1.5rem;
+  margin-bottom: 0.75rem;
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+.prose ul, .prose ol {
+  margin-bottom: 1rem;
+  padding-left: 1.5rem;
+}
+.prose li {
+  margin-bottom: 0.5rem;
+}
+.prose img {
+  max-width: 100%;
+  border-radius: 0.5rem;
+  margin: 1.5rem 0;
+}
+.prose blockquote {
+  border-left: 4px solid #003DA5;
+  padding-left: 1rem;
+  margin: 1.5rem 0;
+  color: #64748B;
+  font-style: italic;
+}
+.prose table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1.5rem 0;
+}
+.prose th, .prose td {
+  border: 1px solid #E2E8F0;
+  padding: 0.5rem 0.75rem;
+  text-align: left;
+}
+.prose th {
+  background: #F1F5F9;
+  font-weight: 600;
+}
+
 /* TipTap editor styles */
 .tiptap-editor .ProseMirror {
   min-height: 200px;

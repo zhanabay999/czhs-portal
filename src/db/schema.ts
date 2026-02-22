@@ -79,6 +79,7 @@ export const users = pgTable(
     phone: varchar("phone", { length: 20 }),
     avatarUrl: text("avatar_url"),
     isActive: boolean("is_active").default(true).notNull(),
+    isApproved: boolean("is_approved").default(false).notNull(),
     preferredLang: languageEnum("preferred_lang").default("kk").notNull(),
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at").defaultNow().notNull(),

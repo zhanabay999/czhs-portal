@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { canAccessAdmin } from "@/lib/permissions";
 import { AdminSidebar } from "@/components/layout/AdminSidebar";
 import { SessionProvider } from "@/components/providers/SessionProvider";
+import { AdminLocaleProvider } from "@/components/providers/AdminLocaleProvider";
 import type { UserRole } from "@/lib/permissions";
 
 export default async function AdminLayout({
@@ -22,10 +23,12 @@ export default async function AdminLayout({
 
   return (
     <SessionProvider>
-      <div className="flex min-h-screen">
-        <AdminSidebar userRole={session.user.role as UserRole} userName={session.user.name || ""} />
-        <main className="flex-1 bg-gray-50 p-6 lg:p-8">{children}</main>
-      </div>
+      <AdminLocaleProvider>
+        <div className="flex min-h-screen">
+          <AdminSidebar userRole={session.user.role as UserRole} userName={session.user.name || ""} />
+          <main className="flex-1 bg-gray-50 p-6 lg:p-8">{children}</main>
+        </div>
+      </AdminLocaleProvider>
     </SessionProvider>
   );
 }

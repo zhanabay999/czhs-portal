@@ -8,12 +8,28 @@ import { eq, desc, sql } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 
 function generateSlug(title: string): string {
-  return title
+  // Transliterate Cyrillic to Latin for clean URL slugs
+  const cyrMap: Record<string, string> = {
+    'а': 'a', 'б': 'b', 'в': 'v', 'г': 'g', 'д': 'd', 'е': 'e', 'ё': 'yo',
+    'ж': 'zh', 'з': 'z', 'и': 'i', 'й': 'y', 'к': 'k', 'л': 'l', 'м': 'm',
+    'н': 'n', 'о': 'o', 'п': 'p', 'р': 'r', 'с': 's', 'т': 't', 'у': 'u',
+    'ф': 'f', 'х': 'kh', 'ц': 'ts', 'ч': 'ch', 'ш': 'sh', 'щ': 'shch',
+    'ъ': '', 'ы': 'y', 'ь': '', 'э': 'e', 'ю': 'yu', 'я': 'ya',
+    // Kazakh specific
+    'ә': 'a', 'ғ': 'g', 'қ': 'q', 'ң': 'n', 'ө': 'o', 'ұ': 'u',
+    'ү': 'u', 'һ': 'h', 'і': 'i',
+  };
+  const transliterated = title
     .toLowerCase()
-    .replace(/[^\w\s-а-яәғқңөұүһіёА-ЯӘҒҚҢӨҰҮҺІЁ]/g, "")
-    .replace(/\s+/g, "-")
-    .replace(/-+/g, "-")
-    .slice(0, 200) + "-" + Date.now().toString(36);
+    .split('')
+    .map(ch => cyrMap[ch] || ch)
+    .join('');
+  return transliterated
+    .replace(/[^a-z0-9\s-]/g, '')
+    .replace(/\s+/g, '-')
+    .replace(/-+/g, '-')
+    .replace(/^-|-$/g, '')
+    .slice(0, 200) + '-' + Date.now().toString(36);
 }
 
 export async function createNewsArticle(data: {

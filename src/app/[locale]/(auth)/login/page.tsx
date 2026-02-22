@@ -10,6 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Train, Loader2, AlertCircle } from "lucide-react";
+import { Link } from "@/i18n/routing";
 
 export default function LoginPage() {
   const t = useTranslations("auth");
@@ -107,6 +108,16 @@ export default function LoginPage() {
               ) : null}
               {tc("login")}
             </Button>
+
+            <p className="text-center text-sm text-muted-foreground">
+              {t("noAccount")}{" "}
+              <Link
+                href="/register"
+                className="font-medium text-[#003DA5] hover:underline"
+              >
+                {t("registerLink")}
+              </Link>
+            </p>
           </form>
         </CardContent>
       </Card>

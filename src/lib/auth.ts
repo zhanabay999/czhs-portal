@@ -32,7 +32,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           .where(eq(users.employeeId, employeeId))
           .limit(1);
 
-        if (!user || !user.isActive) return null;
+        if (!user || !user.isActive || !user.isApproved) return null;
 
         const isValid = await compare(password, user.password);
         if (!isValid) return null;

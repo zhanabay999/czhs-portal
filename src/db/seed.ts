@@ -9,20 +9,37 @@ async function seed() {
 
   console.log("Seeding database...");
 
-  // Create super admin
+  // Create super admin — Махамеджанова Кырмызы Оразовна
   const hashedPassword = await hash("1111", 12);
   await db.insert(schema.users).values({
-    email: "admin@czhs.kz",
+    email: "makhamedzhanova@czhs.kz",
     employeeId: "001",
     password: hashedPassword,
-    firstName: "Админ",
-    lastName: "Бас",
-    patronymic: null,
+    firstName: "Кырмызы",
+    lastName: "Махамеджанова",
+    patronymic: "Оразовна",
     role: "super_admin",
     department: "IT бөлімі",
     position: "Жүйе әкімшісі",
     isActive: true,
+    isApproved: true,
     preferredLang: "kk",
+  }).onConflictDoNothing();
+
+  // Create admin — Нурпейсова Сания Кырыкбаевна
+  await db.insert(schema.users).values({
+    email: "nurpeisova@czhs.kz",
+    employeeId: "002",
+    password: hashedPassword,
+    firstName: "Сания",
+    lastName: "Нурпейсова",
+    patronymic: "Кырыкбаевна",
+    role: "admin",
+    department: "Басқару бөлімі",
+    position: "Әкімші",
+    isActive: true,
+    isApproved: true,
+    preferredLang: "ru",
   }).onConflictDoNothing();
 
   // Create test employee
@@ -36,6 +53,7 @@ async function seed() {
     department: "Жол шаруашылығы",
     position: "Инженер",
     isActive: true,
+    isApproved: true,
     preferredLang: "kk",
   }).onConflictDoNothing();
 
@@ -50,6 +68,7 @@ async function seed() {
     department: "PR бөлімі",
     position: "Мазмұн менеджері",
     isActive: true,
+    isApproved: true,
     preferredLang: "ru",
   }).onConflictDoNothing();
 
@@ -68,12 +87,47 @@ async function seed() {
     { nameKk: "Жалпы сұрақтар", nameRu: "Общие вопросы", sortOrder: 3 },
   ]).onConflictDoNothing();
 
-  // Update all existing user passwords to "1111"
+  // Update all existing user passwords and fix super admin / admin names
   const { eq } = await import("drizzle-orm");
-  await db.update(schema.users).set({ password: hashedPassword });
+  await db.update(schema.users).set({ password: hashedPassword, isApproved: true });
 
-  // Sample news (get admin user id)
-  const [admin] = await db.select().from(schema.users).where(eq(schema.users.email, "admin@czhs.kz")).limit(1);
+  // Update super admin name (employeeId 001)
+  await db.update(schema.users).set({
+    firstName: "Кырмызы",
+    lastName: "Махамеджанова",
+    patronymic: "Оразовна",
+    email: "makhamedzhanova@czhs.kz",
+  }).where(eq(schema.users.employeeId, "001"));
+
+  // Update admin (employeeId 002) or ensure exists
+  const [existingAdmin] = await db.select().from(schema.users).where(eq(schema.users.employeeId, "002")).limit(1);
+  if (!existingAdmin) {
+    await db.insert(schema.users).values({
+      email: "nurpeisova@czhs.kz",
+      employeeId: "002",
+      password: hashedPassword,
+      firstName: "Сания",
+      lastName: "Нурпейсова",
+      patronymic: "Кырыкбаевна",
+      role: "admin",
+      department: "Басқару бөлімі",
+      position: "Әкімші",
+      isActive: true,
+      isApproved: true,
+      preferredLang: "ru",
+    });
+  } else {
+    await db.update(schema.users).set({
+      firstName: "Сания",
+      lastName: "Нурпейсова",
+      patronymic: "Кырыкбаевна",
+      email: "nurpeisova@czhs.kz",
+      role: "admin",
+    }).where(eq(schema.users.employeeId, "002"));
+  }
+
+  // Sample news (get super admin user id)
+  const [admin] = await db.select().from(schema.users).where(eq(schema.users.employeeId, "001")).limit(1);
 
   if (admin) {
     await db.insert(schema.newsArticles).values([

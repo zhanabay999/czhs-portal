@@ -1,7 +1,7 @@
 {
   "common": {
     "appName": "Портал ЦЖС",
-    "appFullName": "Дирекция магистральной сети",
+    "appFullName": "АО «НК «ҚТЖ» Национальный оператор инфраструктуры",
     "companyName": "АО «НК «КТЖ»",
     "login": "Войти",
     "logout": "Выйти",
@@ -141,9 +141,25 @@
     "employeeId": "Табельный номер",
     "rememberMe": "Запомнить меня",
     "forgotPassword": "Забыли пароль?",
-    "invalidCredentials": "Неверный email или пароль",
+    "invalidCredentials": "Неверный табельный номер или пароль",
     "accountDisabled": "Ваш аккаунт отключён",
-    "loginSuccess": "Вход выполнен успешно"
+    "loginSuccess": "Вход выполнен успешно",
+    "registerTitle": "Регистрация",
+    "lastName": "Фамилия",
+    "firstName": "Имя",
+    "patronymic": "Отчество",
+    "consent": "Я даю свое согласие на обработку моих персональных данных",
+    "registerButton": "Зарегистрироваться",
+    "alreadyHaveAccount": "Уже есть аккаунт?",
+    "noAccount": "Нет аккаунта?",
+    "loginLink": "Войти",
+    "registerLink": "Зарегистрироваться",
+    "registerSuccess": "Заявка на регистрацию отправлена. Ожидайте одобрения администратора.",
+    "accountPending": "Ваша заявка на рассмотрении",
+    "employeeIdTaken": "Этот табельный номер уже зарегистрирован",
+    "required": "Заполните все обязательные поля",
+    "invalidEmployeeId": "Неверный формат табельного номера",
+    "passwordTooShort": "Пароль должен содержать минимум 4 символа"
   },
   "portal": {
     "title": "Портал сотрудника",

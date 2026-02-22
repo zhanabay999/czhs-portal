@@ -10,63 +10,25 @@ import {
   Crown,
   Trophy,
   ArrowRight,
-  Train,
   ChevronRight,
+  Clock,
 } from "lucide-react";
-import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
+import { NewsCarousel } from "@/components/NewsCarousel";
 import { db } from "@/db";
-import { newsArticles, users } from "@/db/schema";
-import { desc, eq } from "drizzle-orm";
+import { newsArticles } from "@/db/schema";
+import { desc, eq, and } from "drizzle-orm";
 
 type Props = {
   params: Promise<{ locale: string }>;
 };
 
-const quickLinks = [
-  {
-    key: "news",
-    href: "/news",
-    icon: Newspaper,
-    color: "bg-blue-500",
-  },
-  {
-    key: "sanatorium",
-    href: "/sanatorium",
-    icon: Heart,
-    color: "bg-emerald-500",
-  },
-  {
-    key: "vacancies",
-    href: "/vacancies",
-    icon: Briefcase,
-    color: "bg-amber-500",
-  },
-  {
-    key: "summerCamp",
-    href: "/summer-camp",
-    icon: Sun,
-    color: "bg-orange-500",
-  },
-  {
-    key: "faq",
-    href: "/reorganization-faq",
-    icon: HelpCircle,
-    color: "bg-purple-500",
-  },
-  {
-    key: "beautyContest",
-    href: "/beauty-contest",
-    icon: Crown,
-    color: "bg-pink-500",
-  },
-  {
-    key: "sports",
-    href: "/sports",
-    icon: Trophy,
-    color: "bg-red-500",
-  },
+const sectionLinks = [
+  { key: "sanatorium", href: "/sanatorium", icon: Heart, color: "text-emerald-600", bg: "bg-emerald-50" },
+  { key: "vacancies", href: "/vacancies", icon: Briefcase, color: "text-amber-600", bg: "bg-amber-50" },
+  { key: "summerCamp", href: "/summer-camp", icon: Sun, color: "text-orange-600", bg: "bg-orange-50" },
+  { key: "faq", href: "/reorganization-faq", icon: HelpCircle, color: "text-purple-600", bg: "bg-purple-50" },
+  { key: "beautyContest", href: "/beauty-contest", icon: Crown, color: "text-pink-600", bg: "bg-pink-50" },
+  { key: "sports", href: "/sports", icon: Trophy, color: "text-red-600", bg: "bg-red-50" },
 ];
 
 export default async function HomePage({ params }: Props) {
@@ -82,7 +44,7 @@ export default async function HomePage({ params }: Props) {
     excerptRu: string | null;
     coverImageUrl: string | null;
     publishedAt: Date | null;
-    categoryId: string | null;
+    isPinned: boolean;
   }> = [];
 
   try {
@@ -96,15 +58,18 @@ export default async function HomePage({ params }: Props) {
         excerptRu: newsArticles.excerptRu,
         coverImageUrl: newsArticles.coverImageUrl,
         publishedAt: newsArticles.publishedAt,
-        categoryId: newsArticles.categoryId,
+        isPinned: newsArticles.isPinned,
       })
       .from(newsArticles)
-      .where(eq(newsArticles.status, "published"))
-      .orderBy(desc(newsArticles.publishedAt))
-      .limit(6);
-  } catch {
-    // DB may not be ready yet
-  }
+      .where(
+        and(
+          eq(newsArticles.status, "published"),
+          eq(newsArticles.isInternal, false)
+        )
+      )
+      .orderBy(desc(newsArticles.isPinned), desc(newsArticles.publishedAt))
+      .limit(10);
+  } catch {}
 
   return <HomeContent locale={locale} latestNews={latestNews} />;
 }
@@ -123,6 +88,7 @@ function HomeContent({
     excerptRu: string | null;
     coverImageUrl: string | null;
     publishedAt: Date | null;
+    isPinned: boolean;
   }>;
 }) {
   const t = useTranslations("home");
@@ -130,174 +96,228 @@ function HomeContent({
   const tc = useTranslations("common");
   const isKk = locale === "kk";
 
+  const featured = latestNews[0];
+  const restNews = latestNews.slice(1, 7);
+
+  const formatDate = (date: Date | null) => {
+    if (!date) return "";
+    return new Date(date).toLocaleDateString(
+      locale === "kk" ? "kk-KZ" : "ru-RU",
+      { year: "numeric", month: "long", day: "numeric" }
+    );
+  };
+
   return (
-    <>
-      {/* Hero Section */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-[#003DA5] via-[#0052D4] to-[#0066CC] text-white">
-        <div className="absolute inset-0 opacity-10">
-          <div className="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg%20width%3D%2260%22%20height%3D%2260%22%20viewBox%3D%220%200%2060%2060%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Cpath%20d%3D%22M0%2030h60M30%200v60%22%20stroke%3D%22%23fff%22%20stroke-width%3D%221%22%20fill%3D%22none%22%2F%3E%3C%2Fsvg%3E')]" />
-        </div>
-        <div className="container relative mx-auto px-4 py-20 lg:py-32">
-          <div className="mx-auto max-w-4xl text-center">
-            <div className="mb-6 inline-flex items-center gap-2 rounded-full bg-white/15 px-4 py-2 text-sm backdrop-blur">
-              <Train className="h-4 w-4" />
-              <span>{tc("companyName")}</span>
-            </div>
-            <h1 className="mb-6 text-4xl font-bold tracking-tight lg:text-6xl">
-              {t("heroTitle")}
-            </h1>
-            <p className="mb-8 text-lg text-blue-100 lg:text-xl">
-              {t("heroSubtitle")}
-            </p>
-            <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
-              <Button
-                asChild
-                size="lg"
-                className="bg-[#C8A951] text-[#1A1A2E] hover:bg-[#D4B862]"
-              >
-                <Link href="/news">
-                  {tn("news")}
-                  <ArrowRight className="ml-2 h-4 w-4" />
-                </Link>
-              </Button>
-              <Button
-                asChild
-                size="lg"
-                variant="outline"
-                className="border-white/30 bg-white/10 text-white hover:bg-white/20"
-              >
-                <Link href="/login">{tc("login")}</Link>
-              </Button>
-            </div>
-          </div>
-        </div>
-        {/* Decorative train track line */}
-        <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-[#C8A951] to-transparent" />
-      </section>
-
-      {/* Quick Links */}
-      <section className="bg-gray-50 py-16">
-        <div className="container mx-auto px-4">
-          <h2 className="mb-8 text-center text-2xl font-bold text-[#003DA5]">
-            {t("quickLinks")}
-          </h2>
-          <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-7">
-            {quickLinks.map((item) => (
-              <Link key={item.key} href={item.href}>
-                <Card className="group h-full cursor-pointer border-0 shadow-sm transition-all hover:-translate-y-1 hover:shadow-lg">
-                  <CardContent className="flex flex-col items-center gap-3 p-6 text-center">
-                    <div
-                      className={`${item.color} flex h-12 w-12 items-center justify-center rounded-xl text-white transition-transform group-hover:scale-110`}
-                    >
-                      <item.icon className="h-6 w-6" />
-                    </div>
-                    <span className="text-sm font-medium leading-tight">
-                      {tn(item.key)}
-                    </span>
-                  </CardContent>
-                </Card>
-              </Link>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Latest News */}
-      <section className="py-16">
-        <div className="container mx-auto px-4">
-          <div className="mb-8 flex items-center justify-between">
-            <h2 className="text-2xl font-bold text-[#003DA5]">
-              {t("latestNews")}
+    <div className="bg-white">
+      {/* Featured + Latest News */}
+      <section className="border-b border-gray-200">
+        <div className="container mx-auto px-4 py-8">
+          {/* Section heading */}
+          <div className="mb-6 flex items-center justify-between border-b-2 border-[#003DA5] pb-3">
+            <h2 className="text-xl font-bold text-[#003DA5]">
+              {isKk ? "Актуалды" : "Актуально"}
             </h2>
-            <Button asChild variant="ghost" className="text-[#003DA5]">
-              <Link href="/news">
-                {tc("viewAll")}
-                <ChevronRight className="ml-1 h-4 w-4" />
-              </Link>
-            </Button>
+            <Link
+              href="/news"
+              className="flex items-center gap-1 text-sm font-medium text-[#003DA5] hover:underline"
+            >
+              {tc("viewAll")}
+              <ChevronRight className="h-4 w-4" />
+            </Link>
           </div>
-          {latestNews.length > 0 ? (
-            <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-              {latestNews.map((article) => (
-                <Link key={article.id} href={`/news/${article.slug}`}>
-                  <Card className="group h-full cursor-pointer overflow-hidden border-0 shadow-sm transition-all hover:-translate-y-1 hover:shadow-lg">
-                    <div className="relative h-48 overflow-hidden bg-gradient-to-br from-[#003DA5] to-[#0066CC]">
-                      {article.coverImageUrl ? (
-                        <img
-                          src={article.coverImageUrl}
-                          alt={isKk ? article.titleKk : article.titleRu}
-                          className="h-full w-full object-cover transition-transform group-hover:scale-105"
-                        />
-                      ) : (
-                        <div className="flex h-full items-center justify-center">
-                          <Newspaper className="h-12 w-12 text-white/30" />
-                        </div>
-                      )}
-                    </div>
-                    <CardContent className="p-5">
-                      {article.publishedAt && (
-                        <p className="mb-2 text-xs text-muted-foreground">
-                          {new Date(article.publishedAt).toLocaleDateString(
-                            locale === "kk" ? "kk-KZ" : "ru-RU",
-                            {
-                              year: "numeric",
-                              month: "long",
-                              day: "numeric",
-                            }
-                          )}
-                        </p>
-                      )}
-                      <h3 className="mb-2 line-clamp-2 font-semibold leading-tight transition-colors group-hover:text-[#003DA5]">
-                        {isKk ? article.titleKk : article.titleRu}
-                      </h3>
-                      {(isKk ? article.excerptKk : article.excerptRu) && (
-                        <p className="line-clamp-2 text-sm text-muted-foreground">
-                          {isKk ? article.excerptKk : article.excerptRu}
-                        </p>
-                      )}
-                    </CardContent>
-                  </Card>
+
+          {featured ? (
+            <div className="grid gap-8 lg:grid-cols-5">
+              {/* Featured article - takes 3 columns */}
+              <div className="lg:col-span-3">
+                <Link href={`/news/${featured.slug}`} className="group block">
+                  <div className="relative mb-4 aspect-[16/9] overflow-hidden rounded-lg bg-gray-100">
+                    {featured.coverImageUrl ? (
+                      <img
+                        src={featured.coverImageUrl}
+                        alt={isKk ? featured.titleKk : featured.titleRu}
+                        className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+                      />
+                    ) : (
+                      <div className="flex h-full items-center justify-center bg-gradient-to-br from-[#003DA5] to-[#0066CC]">
+                        <Newspaper className="h-16 w-16 text-white/30" />
+                      </div>
+                    )}
+                    {featured.isPinned && (
+                      <span className="absolute left-3 top-3 rounded bg-[#C8A951] px-2 py-1 text-xs font-bold text-white">
+                        {isKk ? "Маңызды" : "Важное"}
+                      </span>
+                    )}
+                  </div>
+                  <div className="flex items-center gap-2 text-sm text-gray-500">
+                    <Clock className="h-3.5 w-3.5" />
+                    <time>{formatDate(featured.publishedAt)}</time>
+                  </div>
+                  <h3 className="mt-2 text-2xl font-bold leading-tight text-gray-900 transition-colors group-hover:text-[#003DA5]">
+                    {isKk ? featured.titleKk : featured.titleRu}
+                  </h3>
+                  {(isKk ? featured.excerptKk : featured.excerptRu) && (
+                    <p className="mt-3 text-base leading-relaxed text-gray-600">
+                      {isKk ? featured.excerptKk : featured.excerptRu}
+                    </p>
+                  )}
                 </Link>
-              ))}
+              </div>
+
+              {/* Side news list - takes 2 columns */}
+              <div className="lg:col-span-2">
+                <div className="divide-y divide-gray-100">
+                  {restNews.map((article) => (
+                    <Link
+                      key={article.id}
+                      href={`/news/${article.slug}`}
+                      className="group block py-4 first:pt-0 last:pb-0"
+                    >
+                      <div className="flex items-center gap-2 text-xs text-gray-400">
+                        <Clock className="h-3 w-3" />
+                        <time>{formatDate(article.publishedAt)}</time>
+                        {article.isPinned && (
+                          <span className="rounded bg-[#C8A951]/10 px-1.5 py-0.5 text-[10px] font-semibold text-[#C8A951]">
+                            {isKk ? "Маңызды" : "Важное"}
+                          </span>
+                        )}
+                      </div>
+                      <h4 className="mt-1.5 text-sm font-semibold leading-snug text-gray-800 transition-colors group-hover:text-[#003DA5]">
+                        {isKk ? article.titleKk : article.titleRu}
+                      </h4>
+                    </Link>
+                  ))}
+                </div>
+              </div>
             </div>
           ) : (
             <div className="rounded-lg border border-dashed border-gray-300 p-12 text-center">
               <Newspaper className="mx-auto mb-4 h-12 w-12 text-gray-300" />
-              <p className="text-muted-foreground">
-                {isKk
-                  ? "Жаңалықтар жақында жарияланады"
-                  : "Новости скоро появятся"}
+              <p className="text-gray-500">
+                {isKk ? "Жаңалықтар жақында жарияланады" : "Новости скоро появятся"}
               </p>
             </div>
           )}
         </div>
       </section>
 
-      {/* CTA Section */}
-      <section className="bg-gradient-to-r from-[#003DA5] to-[#0066CC] py-16 text-white">
-        <div className="container mx-auto px-4 text-center">
-          <h2 className="mb-4 text-2xl font-bold lg:text-3xl">
-            {isKk
-              ? "Қызметкер порталына қосылыңыз"
-              : "Присоединяйтесь к порталу сотрудника"}
-          </h2>
-          <p className="mb-8 text-blue-100">
-            {isKk
-              ? "Ішкі жаңалықтар, конкурстар және көбірек мүмкіндіктер"
-              : "Внутренние новости, конкурсы и больше возможностей"}
-          </p>
-          <Button
-            asChild
-            size="lg"
-            className="bg-[#C8A951] text-[#1A1A2E] hover:bg-[#D4B862]"
-          >
-            <Link href="/login">
-              {tc("login")}
-              <ArrowRight className="ml-2 h-4 w-4" />
-            </Link>
-          </Button>
+      {/* Section Links Grid */}
+      <section className="border-b border-gray-200 bg-gray-50">
+        <div className="container mx-auto px-4 py-8">
+          <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
+            {sectionLinks.map((item) => (
+              <Link key={item.key} href={item.href} className="group">
+                <div className="flex flex-col items-center gap-3 rounded-lg border border-gray-200 bg-white p-5 text-center transition-all hover:border-[#003DA5]/30 hover:shadow-md">
+                  <div className={`flex h-10 w-10 items-center justify-center rounded-lg ${item.bg}`}>
+                    <item.icon className={`h-5 w-5 ${item.color}`} />
+                  </div>
+                  <span className="text-sm font-medium leading-tight text-gray-700 group-hover:text-[#003DA5]">
+                    {tn(item.key)}
+                  </span>
+                </div>
+              </Link>
+            ))}
+          </div>
         </div>
       </section>
-    </>
+
+      {/* Partners */}
+      <section className="border-t border-gray-200 bg-gray-50">
+        <div className="container mx-auto px-4 py-8">
+          <div className="mb-6 border-b-2 border-[#003DA5] pb-3">
+            <h2 className="text-xl font-bold text-[#003DA5]">
+              {isKk ? "Біздің серіктестер" : "Наши партнёры"}
+            </h2>
+          </div>
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-3">
+            {/* Bolashak Charity */}
+            <Link href="/partners/bolashak" className="group flex flex-col items-center rounded-lg border border-gray-200 bg-white p-6 text-center transition-all hover:border-[#003DA5]/30 hover:shadow-md">
+              <div className="mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-[#003DA5]/10">
+                <Heart className="h-10 w-10 text-[#003DA5]" />
+              </div>
+              <h3 className="mb-2 text-sm font-bold text-gray-900 group-hover:text-[#003DA5]">
+                BOLASHAK CHARITY
+              </h3>
+              <span className="mt-auto inline-flex items-center gap-1.5 text-xs font-medium text-[#003DA5]">
+                {isKk ? "Толығырақ" : "Подробнее"} <ChevronRight className="h-3 w-3" />
+              </span>
+            </Link>
+
+            {/* Sabi Health */}
+            <Link href="/partners/sabi" className="group flex flex-col items-center rounded-lg border border-gray-200 bg-white p-6 text-center transition-all hover:border-[#003DA5]/30 hover:shadow-md">
+              <div className="mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-emerald-50">
+                <Sun className="h-10 w-10 text-emerald-600" />
+              </div>
+              <h3 className="mb-2 text-sm font-bold text-gray-900 group-hover:text-[#003DA5]">
+                SABI HEALTH
+              </h3>
+              <span className="mt-auto inline-flex items-center gap-1.5 text-xs font-medium text-[#003DA5]">
+                {isKk ? "Толығырақ" : "Подробнее"} <ChevronRight className="h-3 w-3" />
+              </span>
+            </Link>
+
+            {/* RCLA */}
+            <Link href="/partners/rcla" className="group flex flex-col items-center rounded-lg border border-gray-200 bg-white p-6 text-center transition-all hover:border-[#003DA5]/30 hover:shadow-md">
+              <div className="mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-amber-50">
+                <HelpCircle className="h-10 w-10 text-amber-600" />
+              </div>
+              <h3 className="mb-2 text-sm font-bold text-gray-900 group-hover:text-[#003DA5]">
+                {isKk
+                  ? "Заң кеңесшілерінің Республикалық алқасы"
+                  : "Республиканская Коллегия Юридических Консультантов"}
+              </h3>
+              <span className="mt-auto inline-flex items-center gap-1.5 text-xs font-medium text-[#003DA5]">
+                {isKk ? "Толығырақ" : "Подробнее"} <ChevronRight className="h-3 w-3" />
+              </span>
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* Latest News Grid */}
+      {latestNews.length > 0 && (
+        <section>
+          <div className="container mx-auto px-4 py-8">
+            <div className="mb-6 flex items-center justify-between border-b-2 border-[#003DA5] pb-3">
+              <h2 className="text-xl font-bold text-[#003DA5]">{t("latestNews")}</h2>
+              <Link
+                href="/news"
+                className="flex items-center gap-1 text-sm font-medium text-[#003DA5] hover:underline"
+              >
+                {tc("viewAll")}
+                <ChevronRight className="h-4 w-4" />
+              </Link>
+            </div>
+            <NewsCarousel
+              articles={latestNews}
+              locale={locale}
+            />
+          </div>
+        </section>
+      )}
+
+      {/* Employee Portal CTA */}
+      <section className="border-t border-gray-200 bg-[#003DA5]">
+        <div className="container mx-auto flex flex-col items-center justify-between gap-4 px-4 py-8 sm:flex-row">
+          <div className="text-white">
+            <h3 className="text-lg font-bold">
+              {isKk ? "Қызметкер порталы" : "Портал сотрудника"}
+            </h3>
+            <p className="text-sm text-blue-200">
+              {isKk
+                ? "Ішкі жаңалықтар, конкурстар және көбірек мүмкіндіктер"
+                : "Внутренние новости, конкурсы и больше возможностей"}
+            </p>
+          </div>
+          <Link
+            href="/login"
+            className="inline-flex items-center gap-2 rounded-lg bg-white px-6 py-2.5 text-sm font-bold text-[#003DA5] transition-colors hover:bg-gray-100"
+          >
+            {tc("login")}
+            <ArrowRight className="h-4 w-4" />
+          </Link>
+        </div>
+      </section>
+    </div>
   );
 }
