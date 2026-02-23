@@ -1,11 +1,8 @@
 import { setRequestLocale } from "next-intl/server";
 import { Link } from "@/i18n/routing";
-import { ArrowLeft, ExternalLink, Heart, Newspaper, Clock } from "lucide-react";
+import { ArrowLeft, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ExpandableSection } from "./expandable-section";
-import { db } from "@/db";
-import { newsArticles } from "@/db/schema";
-import { desc, eq, and } from "drizzle-orm";
 
 type Props = { params: Promise<{ locale: string }> };
 
@@ -14,62 +11,35 @@ export default async function BolashakPage({ params }: Props) {
   setRequestLocale(locale);
   const isKk = locale === "kk";
 
-  let latestNews: Array<{
-    slug: string;
-    titleKk: string;
-    titleRu: string;
-    excerptKk: string | null;
-    excerptRu: string | null;
-    coverImageUrl: string | null;
-    publishedAt: Date | null;
-  }> = [];
-
-  try {
-    latestNews = await db
-      .select({
-        slug: newsArticles.slug,
-        titleKk: newsArticles.titleKk,
-        titleRu: newsArticles.titleRu,
-        excerptKk: newsArticles.excerptKk,
-        excerptRu: newsArticles.excerptRu,
-        coverImageUrl: newsArticles.coverImageUrl,
-        publishedAt: newsArticles.publishedAt,
-      })
-      .from(newsArticles)
-      .where(
-        and(
-          eq(newsArticles.status, "published"),
-          eq(newsArticles.isInternal, false)
-        )
-      )
-      .orderBy(desc(newsArticles.publishedAt))
-      .limit(4);
-  } catch {}
-
-  const clinics = isKk
-    ? [
-        "Клиника № 1 — Астана",
-        "Клиника № 2 — Алматы",
-        "Клиника № 3 — Шымкент",
-        "Клиника № 4 — Қарағанды",
-        "Клиника № 5 — Ақтау",
-      ]
-    : [
-        "Клиника № 1 — Астана",
-        "Клиника № 2 — Алматы",
-        "Клиника № 3 — Шымкент",
-        "Клиника № 4 — Караганда",
-        "Клиника № 5 — Актау",
-      ];
-
-  const formatDate = (date: Date | null) => {
-    if (!date) return "";
-    return new Date(date).toLocaleDateString(isKk ? "kk-KZ" : "ru-RU", {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-    });
-  };
+  const S = isKk ? "Мектеп" : "Школа";
+  const kpiData = [
+    { city: "Актау", schools: [`${S} №17`] },
+    { city: "Актобе", schools: [`${S} №26`, `${S} №29`] },
+    { city: "Алматы", schools: [`${S} №63`, `${S} №64`, `${S} №74`, `${S} №75`, `${S} №87`, `${S} №116`, `${S} №174`] },
+    { city: "Астана", schools: [`${S} №8`, `${S} №11`, `${S} №37`, `${S} №71`, `${S} №85`, `${S} №88`, `${S} №89`, `${S} №91`, `${S} №92`, `${S} №95`, "Бином имени Сатпаева", "Детский сад №24", "Детский сад №34", "Детский сад №89", "Детский сад №54", "Детский сад №60", "Детский сад №66", "Детский сад №95", "Детский сад №8", "Детский сад №11", "Детский сад №76", "Детский сад №63", "Детский сад №80", "Детский сад №98", "Детский сад №86", "Детский сад №35", "Детский сад №52", "Детский сад №77", "Детский сад №64"] },
+    { city: isKk ? "Атырау" : "Атырау", schools: [`${S} №3`, `${S} №6`, `${S} №21`, `${S} №24`, `${S} №40 ФПП`, `${S} №42`] },
+    { city: isKk ? "Құлсары (Атырау обл.)" : "Кульсары (Атырауская обл.)", schools: [`${S} №7`, "СШ им Нысанбаева ФПП"] },
+    { city: isKk ? "Жаркент (Алматы обл.)" : "Жаркент (Алматинская обл.)", schools: ["СШ им. Алтынсарина ФПП"] },
+    { city: isKk ? "Жезқазған" : "Жезказган", schools: [`${S} №13`] },
+    { city: isKk ? "Қарағанды" : "Караганда", schools: [`${S} №5`, `${S} №10`, `${S} №33`, `${S} №48`, `${S} №82`, `${S} №102`] },
+    { city: isKk ? "Көкшетау" : "Кокшетау", schools: [`${S} №4`] },
+    { city: isKk ? "Қостанай" : "Костанай", schools: [`${S} №27`, `${S} №29`] },
+    { city: isKk ? "Қарасу (Қостанай обл.)" : "Карасу (Костанайская обл.)", schools: ["Карасуская школа ФПП"] },
+    { city: isKk ? "Рудный (Қостанай обл.)" : "Рудный (Костанайская обл.)", schools: [`${S} №17 ФПП`] },
+    { city: isKk ? "Қызылорда" : "Кызылорда", schools: [`${S} №6`, `${S} №23`] },
+    { city: isKk ? "Павлодар" : "Павлодар", schools: [`${S} №6`] },
+    { city: isKk ? "Петропавл" : "Петропавловск", schools: [`${S} №8`, `${S} №21`, `${S} №23`] },
+    { city: isKk ? "Семей" : "Семей", schools: [`${S} №17`, `${S} №27`, `${S} №36 ФПП`] },
+    { city: isKk ? "Талдықорған" : "Талдыкорган", schools: [`${S} №7`, `${S} №27 ФПП`] },
+    { city: isKk ? "Тараз" : "Тараз", schools: [`${S} №9 ФПП`, `${S} №32`, `${S} №35 ФПП`] },
+    { city: isKk ? "Теміртау" : "Темиртау", schools: [`${S} №10`] },
+    { city: isKk ? "Түркістан" : "Туркестан", schools: [`${S} №1 ФПП`, `${S} №21 ФПП`, `${S} №24`] },
+    { city: isKk ? "Орал" : "Уральск", schools: [`${S} №5 ФПП`, `${S} №13`, `${S} №21`] },
+    { city: isKk ? "Подстепное (БҚО)" : "Подстепное (Западно-Казахстанская обл.)", schools: [`${S} №1 ФПП`] },
+    { city: isKk ? "Өскемен" : "Усть-Каменогорск", schools: [`${S} №15`, `${S} №17 ФПП`, `${S} №26`, `${S} №36`, `${S} №39`] },
+    { city: isKk ? "Екібастұз" : "Экибастуз", schools: [`${S} №10`] },
+    { city: isKk ? "Шымкент" : "Шымкент", schools: [`${S} №12`, `${S} №19`, `${S} №37`] },
+  ];
 
   return (
     <div className="container mx-auto max-w-3xl px-4 py-8">
@@ -81,8 +51,8 @@ export default async function BolashakPage({ params }: Props) {
       </Button>
 
       <div className="mb-8 flex flex-col items-center text-center">
-        <div className="mb-6 flex h-24 w-24 items-center justify-center rounded-full bg-[#003DA5]/10">
-          <Heart className="h-12 w-12 text-[#003DA5]" />
+        <div className="mb-6 flex h-24 w-auto items-center justify-center overflow-hidden">
+          <img src="/bolashak-charity-logo.png" alt="Bolashak Charity" className="h-24 w-auto object-contain" />
         </div>
         <h1 className="text-2xl font-bold text-[#003DA5] sm:text-3xl">
           {isKk
@@ -144,91 +114,53 @@ export default async function BolashakPage({ params }: Props) {
         )}
       </div>
 
+      {/* Тест M-CHAT */}
+      <div className="mt-10 flex flex-wrap items-center justify-center gap-3">
+        <a
+          href="https://bolashakcharity.kz/m-chat-r-test-na-pervye-priznaki-autizma-u-rebenka/"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex items-center gap-2 rounded-lg bg-[#003DA5] px-6 py-3 text-sm font-bold text-white transition-colors hover:bg-[#002D7A]"
+        >
+          {isKk ? "M-CHAT ТЕСТІН ТАПСЫРУ" : "Пройти ТЕСТ M-CHAT"}
+          <ExternalLink className="h-4 w-4" />
+        </a>
+        <a
+          href="https://www.youtube.com/watch?v=MHriJZC4q7g&list=PLhvBiDNqdcQSxPlfnK1zCn3iNFwrb5aR1"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex items-center gap-2 rounded-lg border border-[#003DA5] px-6 py-3 text-sm font-bold text-[#003DA5] transition-colors hover:bg-[#003DA5]/5"
+        >
+          {isKk ? "Бейне нұсқаулықты көру" : "Посмотреть видеоинструкцию"}
+          <ExternalLink className="h-4 w-4" />
+        </a>
+      </div>
+
       {/* Список клиник */}
       <div className="mt-10">
         <h2 className="mb-4 text-xl font-bold text-[#003DA5]">
-          {isKk ? "Клиникалар тізімі" : "Список клиник"}
+          {isKk ? "Инклюзияны қолдау кабинеттерінің тізімі (ИҚК)" : "Список кабинетов поддержки инклюзии (КПИ)"}
         </h2>
         <ExpandableSection
-          title={isKk ? "Клиникаларды көру" : "Показать клиники"}
+          title={isKk ? "Кабинеттерді көрсету" : "Показать кабинеты"}
         >
-          <ul className="space-y-2">
-            {clinics.map((clinic, i) => (
-              <li
-                key={i}
-                className="flex items-center gap-3 rounded-md border border-gray-100 bg-gray-50 px-4 py-3 text-sm text-gray-700"
-              >
-                <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[#003DA5]/10 text-xs font-bold text-[#003DA5]">
-                  {i + 1}
-                </span>
-                {clinic}
-              </li>
+          <div className="space-y-2">
+            {kpiData.map((item, i) => (
+              <ExpandableSection key={i} title={item.city}>
+                <ul className="space-y-1">
+                  {item.schools.map((school, j) => (
+                    <li
+                      key={j}
+                      className="rounded-md bg-gray-50 px-4 py-2 text-sm text-gray-700"
+                    >
+                      {school}
+                    </li>
+                  ))}
+                </ul>
+              </ExpandableSection>
             ))}
-          </ul>
+          </div>
         </ExpandableSection>
-      </div>
-
-      {/* Новости */}
-      <div className="mt-10">
-        <h2 className="mb-4 text-xl font-bold text-[#003DA5]">
-          {isKk ? "Жаңалықтар" : "Новости"}
-        </h2>
-        {latestNews.length > 0 ? (
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-            {latestNews.map((article) => (
-              <Link
-                key={article.slug}
-                href={`/news/${article.slug}`}
-                className="group overflow-hidden rounded-lg border border-gray-200 transition-all hover:shadow-md"
-              >
-                <div className="relative aspect-[16/10] overflow-hidden bg-gray-100">
-                  {article.coverImageUrl ? (
-                    <img
-                      src={article.coverImageUrl}
-                      alt={isKk ? article.titleKk : article.titleRu}
-                      className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
-                    />
-                  ) : (
-                    <div className="flex h-full items-center justify-center bg-gradient-to-br from-[#003DA5]/80 to-[#0066CC]/80">
-                      <Newspaper className="h-8 w-8 text-white/30" />
-                    </div>
-                  )}
-                </div>
-                <div className="p-4">
-                  <div className="flex items-center gap-2 text-xs text-gray-400">
-                    <Clock className="h-3 w-3" />
-                    {formatDate(article.publishedAt)}
-                  </div>
-                  <h3 className="mt-2 line-clamp-2 text-sm font-bold leading-snug text-gray-800 transition-colors group-hover:text-[#003DA5]">
-                    {isKk ? article.titleKk : article.titleRu}
-                  </h3>
-                  {(isKk ? article.excerptKk : article.excerptRu) && (
-                    <p className="mt-1 line-clamp-2 text-xs leading-relaxed text-gray-500">
-                      {isKk ? article.excerptKk : article.excerptRu}
-                    </p>
-                  )}
-                </div>
-              </Link>
-            ))}
-          </div>
-        ) : (
-          <div className="rounded-lg border border-dashed border-gray-300 p-8 text-center">
-            <Newspaper className="mx-auto mb-3 h-10 w-10 text-gray-300" />
-            <p className="text-sm text-gray-500">
-              {isKk ? "Жаңалықтар жоқ" : "Новостей пока нет"}
-            </p>
-          </div>
-        )}
-
-        {latestNews.length > 0 && (
-          <div className="mt-4 flex justify-center">
-            <Button asChild variant="outline">
-              <Link href="/news">
-                {isKk ? "Барлық жаңалықтар" : "Все новости"}
-              </Link>
-            </Button>
-          </div>
-        )}
       </div>
 
       <div className="mt-10 flex justify-center">

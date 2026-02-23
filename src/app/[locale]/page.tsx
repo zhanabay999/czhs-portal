@@ -230,10 +230,25 @@ function HomeContent({
             </h2>
           </div>
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-3">
+            {/* RCLA */}
+            <Link href="/partners/rcla" className="group flex flex-col items-center rounded-lg border border-gray-200 bg-white p-6 text-center transition-all hover:border-[#003DA5]/30 hover:shadow-md">
+              <div className="mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-amber-50">
+                <HelpCircle className="h-10 w-10 text-amber-600" />
+              </div>
+              <h3 className="mb-2 text-sm font-bold text-gray-900 group-hover:text-[#003DA5]">
+                {isKk
+                  ? "Заң кеңесшілерінің Республикалық алқасы"
+                  : "Республиканская Коллегия Юридических Консультантов"}
+              </h3>
+              <span className="mt-auto inline-flex items-center gap-1.5 text-xs font-medium text-[#003DA5]">
+                {isKk ? "Толығырақ" : "Подробнее"} <ChevronRight className="h-3 w-3" />
+              </span>
+            </Link>
+
             {/* Bolashak Charity */}
             <Link href="/partners/bolashak" className="group flex flex-col items-center rounded-lg border border-gray-200 bg-white p-6 text-center transition-all hover:border-[#003DA5]/30 hover:shadow-md">
-              <div className="mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-[#003DA5]/10">
-                <Heart className="h-10 w-10 text-[#003DA5]" />
+              <div className="mb-4 flex h-20 w-20 items-center justify-center overflow-hidden">
+                <img src="/bolashak-charity-logo.png" alt="Bolashak Charity" className="h-20 w-auto object-contain" />
               </div>
               <h3 className="mb-2 text-sm font-bold text-gray-900 group-hover:text-[#003DA5]">
                 BOLASHAK CHARITY
@@ -245,26 +260,11 @@ function HomeContent({
 
             {/* Sabi Health */}
             <Link href="/partners/sabi" className="group flex flex-col items-center rounded-lg border border-gray-200 bg-white p-6 text-center transition-all hover:border-[#003DA5]/30 hover:shadow-md">
-              <div className="mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-emerald-50">
-                <Sun className="h-10 w-10 text-emerald-600" />
+              <div className="mb-4 flex h-20 w-20 items-center justify-center overflow-hidden rounded-full">
+                <img src="/sabi-health-logo.png" alt="Sabi Health" className="h-20 w-20 object-contain" />
               </div>
               <h3 className="mb-2 text-sm font-bold text-gray-900 group-hover:text-[#003DA5]">
                 SABI HEALTH
-              </h3>
-              <span className="mt-auto inline-flex items-center gap-1.5 text-xs font-medium text-[#003DA5]">
-                {isKk ? "Толығырақ" : "Подробнее"} <ChevronRight className="h-3 w-3" />
-              </span>
-            </Link>
-
-            {/* RCLA */}
-            <Link href="/partners/rcla" className="group flex flex-col items-center rounded-lg border border-gray-200 bg-white p-6 text-center transition-all hover:border-[#003DA5]/30 hover:shadow-md">
-              <div className="mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-amber-50">
-                <HelpCircle className="h-10 w-10 text-amber-600" />
-              </div>
-              <h3 className="mb-2 text-sm font-bold text-gray-900 group-hover:text-[#003DA5]">
-                {isKk
-                  ? "Заң кеңесшілерінің Республикалық алқасы"
-                  : "Республиканская Коллегия Юридических Консультантов"}
               </h3>
               <span className="mt-auto inline-flex items-center gap-1.5 text-xs font-medium text-[#003DA5]">
                 {isKk ? "Толығырақ" : "Подробнее"} <ChevronRight className="h-3 w-3" />
