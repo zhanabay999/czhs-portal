@@ -19,7 +19,16 @@
       "Bash(NODE_TLS_REJECT_UNAUTHORIZED=0 DATABASE_URL=\"postgresql://neondb_owner:npg_SIrE4uPJZG7K@ep-rapid-mouse-ag08aod8-pooler.c-2.eu-central-1.aws.neon.tech/neondb?sslmode=require\" npx tsx:*)",
       "Bash(pnpm build:*)",
       "Bash(ls:*)",
-      "Bash(node -e:*)"
+      "Bash(node -e:*)",
+      "Bash(git push:*)",
+      "Bash(find:*)",
+      "WebFetch(domain:vm-mv9j2kgldhfv06k3s8rnul.vusercontent.net)",
+      "WebFetch(domain:job.railways.kz)",
+      "Bash(pip install:*)",
+      "Bash(python -c:*)",
+      "Bash(PYTHONIOENCODING=utf-8 python -X utf8 -c:*)",
+      "WebFetch(domain:czhs-portal.vercel.app)",
+      "Bash(python3:*)"
     ]
   }
 }

@@ -6,14 +6,16 @@ import {
   Heart,
   Briefcase,
   Sun,
-  HelpCircle,
-  Crown,
+  RefreshCcw,
+  Flower2,
   Trophy,
   ArrowRight,
-  ChevronRight,
-  Clock,
+  Calendar,
+  Bell,
+  FileText,
+  Users,
+  Shield,
 } from "lucide-react";
-import { NewsCarousel } from "@/components/NewsCarousel";
 import { db } from "@/db";
 import { newsArticles } from "@/db/schema";
 import { desc, eq, and } from "drizzle-orm";
@@ -21,15 +23,6 @@ import { desc, eq, and } from "drizzle-orm";
 type Props = {
   params: Promise<{ locale: string }>;
 };
-
-const sectionLinks = [
-  { key: "sanatorium", href: "/sanatorium", icon: Heart, color: "text-emerald-600", bg: "bg-emerald-50" },
-  { key: "vacancies", href: "/vacancies", icon: Briefcase, color: "text-amber-600", bg: "bg-amber-50" },
-  { key: "summerCamp", href: "/summer-camp", icon: Sun, color: "text-orange-600", bg: "bg-orange-50" },
-  { key: "faq", href: "/reorganization-faq", icon: HelpCircle, color: "text-purple-600", bg: "bg-purple-50" },
-  { key: "beautyContest", href: "/beauty-contest", icon: Crown, color: "text-pink-600", bg: "bg-pink-50" },
-  { key: "sports", href: "/sports", icon: Trophy, color: "text-red-600", bg: "bg-red-50" },
-];
 
 export default async function HomePage({ params }: Props) {
   const { locale } = await params;
@@ -97,7 +90,8 @@ function HomeContent({
   const isKk = locale === "kk";
 
   const featured = latestNews[0];
-  const restNews = latestNews.slice(1, 7);
+  const gridNews = latestNews.slice(1, 3);
+  const sidebarNews = latestNews.slice(3, 7);
 
   const formatDate = (date: Date | null) => {
     if (!date) return "";
@@ -107,113 +101,314 @@ function HomeContent({
     );
   };
 
+  const services = [
+    { key: "sanatorium", href: "/sanatorium", icon: Heart, iconBg: "bg-red-50", iconColor: "text-red-600" },
+    { key: "vacancies", href: "/vacancies", icon: Briefcase, iconBg: "bg-blue-50", iconColor: "text-blue-600" },
+    { key: "summerCamp", href: "/summer-camp", icon: Sun, iconBg: "bg-amber-50", iconColor: "text-amber-600" },
+    { key: "faq", href: "/reorganization-faq", icon: RefreshCcw, iconBg: "bg-emerald-50", iconColor: "text-emerald-600" },
+    { key: "beautyContest", href: "/beauty-contest", icon: Flower2, iconBg: "bg-pink-50", iconColor: "text-pink-600" },
+    { key: "sports", href: "/sports", icon: Trophy, iconBg: "bg-indigo-50", iconColor: "text-indigo-600" },
+    { key: "zhylyZhurekpen", href: "/zhyly-zhurekpen", icon: Heart, iconBg: "bg-orange-50", iconColor: "text-orange-600" },
+  ];
+
+  const serviceDescriptions: Record<string, string> = {
+    sanatorium: isKk
+      ? "Қызметкерлер мен олардың отбасыларына арналған сауықтыру бағдарламалары"
+      : "Программы оздоровления для сотрудников и их семей",
+    vacancies: isKk
+      ? "Магистральдық желі дирекциясындағы бос жұмыс орындары"
+      : "Актуальные вакансии в Дирекции магистральной сети",
+    summerCamp: isKk
+      ? "Балалар лагерьлері мен жазғы демалыс бағдарламалары"
+      : "Детские лагеря и программы летнего отдыха",
+    faq: isKk
+      ? "Қайта ұйымдастыру процестері туралы ақпарат"
+      : "Информация о реорганизационных процессах",
+    beautyContest: isKk
+      ? "Әлеуметтік қолдау және қайырымдылық"
+      : "Социальная поддержка и благотворительность",
+    sports: isKk
+      ? "Спорттық іс-шаралар мен жарыстар"
+      : "Спортивные мероприятия и соревнования",
+    zhylyZhurekpen: isKk
+      ? "«Жылы жүрекпен» әлеуметтік жобасы"
+      : "Социальный проект «Жылы Жүрекпен»",
+  };
+
   return (
-    <div className="bg-white">
-      {/* Featured + Latest News */}
-      <section className="border-b border-gray-200">
-        <div className="container mx-auto px-4 py-8">
-          {/* Section heading */}
-          <div className="mb-6 flex items-center justify-between border-b-2 border-[#003DA5] pb-3">
-            <h2 className="text-xl font-bold text-[#003DA5]">
-              {isKk ? "Актуалды" : "Актуально"}
-            </h2>
+    <div>
+      {/* Hero Section */}
+      <section className="relative overflow-hidden">
+        <div className="relative h-[520px] md:h-[580px] lg:h-[620px]">
+          {featured?.coverImageUrl ? (
+            <img
+              alt={isKk ? featured.titleKk : featured.titleRu}
+              className="absolute inset-0 h-full w-full object-cover"
+              src={featured.coverImageUrl}
+            />
+          ) : (
+            <div className="absolute inset-0 bg-gradient-to-br from-[#003DA5] via-[#002D7A] to-[#001a4d]" />
+          )}
+          <div className="absolute inset-0 bg-gradient-to-r from-foreground/90 via-foreground/60 to-foreground/30" />
+          <div className="relative z-10 mx-auto flex h-full max-w-7xl items-center px-4 lg:px-8">
+            <div className="max-w-2xl">
+              {featured?.isPinned && (
+                <span className="mb-4 inline-flex items-center justify-center rounded-md bg-accent px-3 py-1 text-xs font-semibold uppercase tracking-wider text-accent-foreground">
+                  {isKk ? "Маңызды" : "Важное"}
+                </span>
+              )}
+              <h1 className="mb-4 text-balance text-3xl font-bold leading-tight text-primary-foreground md:text-4xl lg:text-5xl">
+                {featured
+                  ? isKk ? featured.titleKk : featured.titleRu
+                  : t("heroTitle")}
+              </h1>
+              <p className="mb-6 max-w-lg text-base leading-relaxed text-primary-foreground/80 md:text-lg">
+                {featured
+                  ? (isKk ? featured.excerptKk : featured.excerptRu) || t("heroSubtitle")
+                  : t("heroSubtitle")}
+              </p>
+              {featured && (
+                <div className="mb-8 flex items-center gap-3 text-sm text-primary-foreground/60">
+                  <Calendar className="h-4 w-4" />
+                  <span>{formatDate(featured.publishedAt)}</span>
+                </div>
+              )}
+              <div className="flex flex-wrap gap-3">
+                {featured ? (
+                  <Link
+                    href={`/news/${featured.slug}`}
+                    className="inline-flex h-10 items-center gap-2 rounded-md bg-accent px-6 text-sm font-semibold text-accent-foreground transition-colors hover:bg-accent/90"
+                  >
+                    {tc("readMore")}
+                    <ArrowRight className="ml-1 h-4 w-4" />
+                  </Link>
+                ) : null}
+                <Link
+                  href="/news"
+                  className="inline-flex h-10 items-center rounded-md border border-primary-foreground/30 px-6 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary-foreground/10"
+                >
+                  {isKk ? "Барлық жаңалықтар" : "Все новости"}
+                </Link>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Stats Bar */}
+        <div className="bg-primary">
+          <div className="mx-auto max-w-7xl px-4 lg:px-8">
+            <div className="grid grid-cols-3 divide-x divide-primary-foreground/15">
+              {[
+                { value: ">55 000", label: isKk ? "Қызметкер" : "Работников" },
+                { value: ">21 000", label: isKk ? "Километр — ел теміржолдарының ұзындығы" : "Километров составляет протяжённость железных дорог страны" },
+                { value: "19", label: isKk ? "Қазақстан теміржол ұзындығы бойынша әлемде орын алады" : "Место в мире занимает Казахстан по протяжённости железных дорог" },
+              ].map((stat) => (
+                <div key={stat.label} className="px-4 py-5 text-center">
+                  <p className="text-xl font-bold text-primary-foreground md:text-2xl">
+                    {stat.value}
+                  </p>
+                  <p className="mt-1 text-xs text-primary-foreground/70 md:text-sm">
+                    {stat.label}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* News Section */}
+      <section id="news" className="py-16 lg:py-20">
+        <div className="mx-auto max-w-7xl px-4 lg:px-8">
+          <div className="mb-10 flex items-end justify-between">
+            <div>
+              <p className="mb-2 text-sm font-semibold uppercase tracking-wider text-accent">
+                {isKk ? "Жаңалықтар" : "Новости"}
+              </p>
+              <h2 className="text-balance text-2xl font-bold text-foreground md:text-3xl">
+                {isKk ? "Актуалды оқиғалар" : "Актуальные события"}
+              </h2>
+            </div>
             <Link
               href="/news"
-              className="flex items-center gap-1 text-sm font-medium text-[#003DA5] hover:underline"
+              className="hidden items-center gap-2 rounded-md px-4 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground md:flex"
             >
               {tc("viewAll")}
-              <ChevronRight className="h-4 w-4" />
+              <ArrowRight className="h-4 w-4" />
             </Link>
           </div>
 
           {featured ? (
-            <div className="grid gap-8 lg:grid-cols-5">
-              {/* Featured article - takes 3 columns */}
-              <div className="lg:col-span-3">
-                <Link href={`/news/${featured.slug}`} className="group block">
-                  <div className="relative mb-4 aspect-[16/9] overflow-hidden rounded-lg bg-gray-100">
-                    {featured.coverImageUrl ? (
-                      <img
-                        src={featured.coverImageUrl}
-                        alt={isKk ? featured.titleKk : featured.titleRu}
-                        className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
-                      />
-                    ) : (
-                      <div className="flex h-full items-center justify-center bg-gradient-to-br from-[#003DA5] to-[#0066CC]">
-                        <Newspaper className="h-16 w-16 text-white/30" />
-                      </div>
-                    )}
-                    {featured.isPinned && (
-                      <span className="absolute left-3 top-3 rounded bg-[#C8A951] px-2 py-1 text-xs font-bold text-white">
-                        {isKk ? "Маңызды" : "Важное"}
-                      </span>
-                    )}
-                  </div>
-                  <div className="flex items-center gap-2 text-sm text-gray-500">
-                    <Clock className="h-3.5 w-3.5" />
-                    <time>{formatDate(featured.publishedAt)}</time>
-                  </div>
-                  <h3 className="mt-2 text-2xl font-bold leading-tight text-gray-900 transition-colors group-hover:text-[#003DA5]">
-                    {isKk ? featured.titleKk : featured.titleRu}
-                  </h3>
-                  {(isKk ? featured.excerptKk : featured.excerptRu) && (
-                    <p className="mt-3 text-base leading-relaxed text-gray-600">
-                      {isKk ? featured.excerptKk : featured.excerptRu}
-                    </p>
-                  )}
-                </Link>
-              </div>
-
-              {/* Side news list - takes 2 columns */}
-              <div className="lg:col-span-2">
-                <div className="divide-y divide-gray-100">
-                  {restNews.map((article) => (
-                    <Link
-                      key={article.id}
-                      href={`/news/${article.slug}`}
-                      className="group block py-4 first:pt-0 last:pb-0"
-                    >
-                      <div className="flex items-center gap-2 text-xs text-gray-400">
-                        <Clock className="h-3 w-3" />
-                        <time>{formatDate(article.publishedAt)}</time>
-                        {article.isPinned && (
-                          <span className="rounded bg-[#C8A951]/10 px-1.5 py-0.5 text-[10px] font-semibold text-[#C8A951]">
+            <div className="grid gap-6 lg:grid-cols-3">
+              {/* Left: Featured + 2 smaller */}
+              <div className="grid gap-6 md:grid-cols-2 lg:col-span-2">
+                {/* Featured large article */}
+                <Link
+                  href={`/news/${featured.slug}`}
+                  className="group md:col-span-2"
+                >
+                  <article>
+                    <div className="relative mb-4 h-72 overflow-hidden rounded-xl md:h-80">
+                      {featured.coverImageUrl ? (
+                        <img
+                          alt={isKk ? featured.titleKk : featured.titleRu}
+                          className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                          src={featured.coverImageUrl}
+                        />
+                      ) : (
+                        <div className="flex h-full items-center justify-center bg-gradient-to-br from-primary to-[#0066CC]">
+                          <Newspaper className="h-16 w-16 text-white/20" />
+                        </div>
+                      )}
+                      <div className="absolute inset-0 bg-gradient-to-t from-foreground/60 to-transparent" />
+                      <div className="absolute bottom-0 left-0 right-0 p-6">
+                        {featured.isPinned && (
+                          <span className="mb-3 inline-flex items-center justify-center rounded-md border-0 bg-accent px-2 py-0.5 text-xs font-medium text-accent-foreground">
                             {isKk ? "Маңызды" : "Важное"}
                           </span>
                         )}
+                        <h3 className="mb-2 text-xl font-bold text-primary-foreground decoration-2 underline-offset-4 group-hover:underline md:text-2xl">
+                          {isKk ? featured.titleKk : featured.titleRu}
+                        </h3>
+                        <p className="line-clamp-2 text-sm text-primary-foreground/75">
+                          {isKk ? featured.excerptKk : featured.excerptRu}
+                        </p>
                       </div>
-                      <h4 className="mt-1.5 text-sm font-semibold leading-snug text-gray-800 transition-colors group-hover:text-[#003DA5]">
+                    </div>
+                  </article>
+                </Link>
+
+                {/* Two smaller articles */}
+                {gridNews.map((article) => (
+                  <Link
+                    key={article.id}
+                    href={`/news/${article.slug}`}
+                    className="group"
+                  >
+                    <article>
+                      <div className="relative mb-3 h-48 overflow-hidden rounded-xl">
+                        {article.coverImageUrl ? (
+                          <img
+                            alt={isKk ? article.titleKk : article.titleRu}
+                            className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                            src={article.coverImageUrl}
+                          />
+                        ) : (
+                          <div className="flex h-full items-center justify-center bg-gradient-to-br from-primary/80 to-[#0066CC]/80">
+                            <Newspaper className="h-10 w-10 text-white/20" />
+                          </div>
+                        )}
+                      </div>
+                      <div className="mb-2 flex items-center gap-2 text-xs text-muted-foreground">
+                        <Calendar className="h-3.5 w-3.5" />
+                        <span>{formatDate(article.publishedAt)}</span>
+                      </div>
+                      <h3 className="mb-1 line-clamp-2 text-base font-semibold text-foreground transition-colors group-hover:text-primary">
                         {isKk ? article.titleKk : article.titleRu}
-                      </h4>
+                      </h3>
+                      <p className="line-clamp-2 text-sm text-muted-foreground">
+                        {isKk ? article.excerptKk : article.excerptRu}
+                      </p>
+                    </article>
+                  </Link>
+                ))}
+              </div>
+
+              {/* Right sidebar: Latest news list */}
+              <div className="rounded-xl border border-border bg-card p-5">
+                <h3 className="mb-5 text-lg font-bold text-foreground">
+                  {t("latestNews")}
+                </h3>
+                <div className="flex flex-col gap-0">
+                  {sidebarNews.map((article, idx) => (
+                    <Link
+                      key={article.id}
+                      href={`/news/${article.slug}`}
+                      className="group"
+                    >
+                      <article
+                        className={`py-4 ${
+                          idx < sidebarNews.length - 1 ? "border-b border-border" : ""
+                        }`}
+                      >
+                        <h4 className="mb-1.5 line-clamp-2 text-sm font-medium text-foreground transition-colors group-hover:text-primary">
+                          {isKk ? article.titleKk : article.titleRu}
+                        </h4>
+                        <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                          <Calendar className="h-3 w-3" />
+                          <span>{formatDate(article.publishedAt)}</span>
+                        </div>
+                      </article>
                     </Link>
                   ))}
                 </div>
+                <Link
+                  href="/news"
+                  className="mt-4 inline-flex w-full items-center justify-center gap-1.5 rounded-md border border-border bg-background px-3 py-2 text-sm font-medium shadow-xs transition-colors hover:bg-secondary"
+                >
+                  {isKk ? "Барлық жаңалықтар" : "Все новости"}
+                  <ArrowRight className="ml-1 h-3.5 w-3.5" />
+                </Link>
+
               </div>
             </div>
           ) : (
-            <div className="rounded-lg border border-dashed border-gray-300 p-12 text-center">
-              <Newspaper className="mx-auto mb-4 h-12 w-12 text-gray-300" />
-              <p className="text-gray-500">
+            <div className="rounded-xl border border-dashed border-border p-12 text-center">
+              <Newspaper className="mx-auto mb-4 h-12 w-12 text-muted-foreground/30" />
+              <p className="text-muted-foreground">
                 {isKk ? "Жаңалықтар жақында жарияланады" : "Новости скоро появятся"}
               </p>
             </div>
           )}
+
+          {/* Mobile "View all" */}
+          <div className="mt-6 md:hidden">
+            <Link
+              href="/news"
+              className="inline-flex w-full items-center justify-center gap-2 rounded-md border border-border bg-background px-4 py-2 text-sm font-medium shadow-xs transition-colors hover:bg-secondary"
+            >
+              {isKk ? "Барлық жаңалықтарды көру" : "Смотреть все новости"}
+              <ArrowRight className="ml-1 h-4 w-4" />
+            </Link>
+          </div>
         </div>
       </section>
 
-      {/* Section Links Grid */}
-      <section className="border-b border-gray-200 bg-gray-50">
-        <div className="container mx-auto px-4 py-8">
-          <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
-            {sectionLinks.map((item) => (
-              <Link key={item.key} href={item.href} className="group">
-                <div className="flex flex-col items-center gap-3 rounded-lg border border-gray-200 bg-white p-5 text-center transition-all hover:border-[#003DA5]/30 hover:shadow-md">
-                  <div className={`flex h-10 w-10 items-center justify-center rounded-lg ${item.bg}`}>
-                    <item.icon className={`h-5 w-5 ${item.color}`} />
-                  </div>
-                  <span className="text-sm font-medium leading-tight text-gray-700 group-hover:text-[#003DA5]">
-                    {tn(item.key)}
-                  </span>
+      {/* Services Section */}
+      <section id="services" className="bg-secondary/50 py-16 lg:py-20">
+        <div className="mx-auto max-w-7xl px-4 lg:px-8">
+          <div className="mb-12 text-center">
+            <p className="mb-2 text-sm font-semibold uppercase tracking-wider text-accent">
+              {isKk ? "Сервистер" : "Сервисы"}
+            </p>
+            <h2 className="text-balance text-2xl font-bold text-foreground md:text-3xl">
+              {isKk ? "Қызметкерлерге арналған қызметтер" : "Услуги для сотрудников"}
+            </h2>
+            <p className="mx-auto mt-3 max-w-md text-sm text-muted-foreground md:text-base">
+              {isKk
+                ? "Компанияның негізгі сервистері мен бағдарламаларына жылдам қол жеткізу"
+                : "Быстрый доступ к основным сервисам и программам компании"}
+            </p>
+          </div>
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {services.map((service) => (
+              <Link
+                key={service.key}
+                href={service.href}
+                className="group flex items-start gap-4 rounded-xl border border-border bg-card p-5 transition-all duration-300 hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5"
+              >
+                <div
+                  className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-lg ${service.iconBg} ${service.iconColor}`}
+                >
+                  <service.icon className="h-5 w-5" />
+                </div>
+                <div className="min-w-0">
+                  <h3 className="text-sm font-semibold text-foreground transition-colors group-hover:text-primary">
+                    {tn(service.key)}
+                  </h3>
+                  <p className="mt-1 line-clamp-2 text-xs text-muted-foreground">
+                    {serviceDescriptions[service.key]}
+                  </p>
                 </div>
               </Link>
             ))}
@@ -221,101 +416,56 @@ function HomeContent({
         </div>
       </section>
 
-      {/* Partners */}
-      <section className="border-t border-gray-200 bg-gray-50">
-        <div className="container mx-auto px-4 py-8">
-          <div className="mb-6 border-b-2 border-[#003DA5] pb-3">
-            <h2 className="text-xl font-bold text-[#003DA5]">
-              {isKk ? "Біздің серіктестер" : "Наши партнёры"}
-            </h2>
-          </div>
-          <div className="grid grid-cols-1 gap-6 sm:grid-cols-3">
-            {/* RCLA */}
-            <Link href="/partners/rcla" className="group flex flex-col items-center rounded-lg border border-gray-200 bg-white p-6 text-center transition-all hover:border-[#003DA5]/30 hover:shadow-md">
-              <div className="mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-amber-50">
-                <HelpCircle className="h-10 w-10 text-amber-600" />
-              </div>
-              <h3 className="mb-2 text-sm font-bold text-gray-900 group-hover:text-[#003DA5]">
-                {isKk
-                  ? "Заң кеңесшілерінің Республикалық алқасы"
-                  : "Республиканская Коллегия Юридических Консультантов"}
-              </h3>
-              <span className="mt-auto inline-flex items-center gap-1.5 text-xs font-medium text-[#003DA5]">
-                {isKk ? "Толығырақ" : "Подробнее"} <ChevronRight className="h-3 w-3" />
-              </span>
-            </Link>
-
-            {/* Bolashak Charity */}
-            <Link href="/partners/bolashak" className="group flex flex-col items-center rounded-lg border border-gray-200 bg-white p-6 text-center transition-all hover:border-[#003DA5]/30 hover:shadow-md">
-              <div className="mb-4 flex h-20 w-20 items-center justify-center overflow-hidden">
-                <img src="/bolashak-charity-logo.png" alt="Bolashak Charity" className="h-20 w-auto object-contain" />
-              </div>
-              <h3 className="mb-2 text-sm font-bold text-gray-900 group-hover:text-[#003DA5]">
-                BOLASHAK CHARITY
-              </h3>
-              <span className="mt-auto inline-flex items-center gap-1.5 text-xs font-medium text-[#003DA5]">
-                {isKk ? "Толығырақ" : "Подробнее"} <ChevronRight className="h-3 w-3" />
-              </span>
-            </Link>
-
-            {/* Sabi Health */}
-            <Link href="/partners/sabi" className="group flex flex-col items-center rounded-lg border border-gray-200 bg-white p-6 text-center transition-all hover:border-[#003DA5]/30 hover:shadow-md">
-              <div className="mb-4 flex h-20 w-20 items-center justify-center overflow-hidden rounded-full">
-                <img src="/sabi-health-logo.png" alt="Sabi Health" className="h-20 w-20 object-contain" />
-              </div>
-              <h3 className="mb-2 text-sm font-bold text-gray-900 group-hover:text-[#003DA5]">
-                SABI HEALTH
-              </h3>
-              <span className="mt-auto inline-flex items-center gap-1.5 text-xs font-medium text-[#003DA5]">
-                {isKk ? "Толығырақ" : "Подробнее"} <ChevronRight className="h-3 w-3" />
-              </span>
-            </Link>
-          </div>
-        </div>
-      </section>
-
-      {/* Latest News Grid */}
-      {latestNews.length > 0 && (
-        <section>
-          <div className="container mx-auto px-4 py-8">
-            <div className="mb-6 flex items-center justify-between border-b-2 border-[#003DA5] pb-3">
-              <h2 className="text-xl font-bold text-[#003DA5]">{t("latestNews")}</h2>
-              <Link
-                href="/news"
-                className="flex items-center gap-1 text-sm font-medium text-[#003DA5] hover:underline"
-              >
-                {tc("viewAll")}
-                <ChevronRight className="h-4 w-4" />
-              </Link>
-            </div>
-            <NewsCarousel
-              articles={latestNews}
-              locale={locale}
-            />
-          </div>
-        </section>
-      )}
-
       {/* Employee Portal CTA */}
-      <section className="border-t border-gray-200 bg-[#003DA5]">
-        <div className="container mx-auto flex flex-col items-center justify-between gap-4 px-4 py-8 sm:flex-row">
-          <div className="text-white">
-            <h3 className="text-lg font-bold">
-              {isKk ? "Қызметкер порталы" : "Портал сотрудника"}
-            </h3>
-            <p className="text-sm text-blue-200">
-              {isKk
-                ? "Ішкі жаңалықтар, конкурстар және көбірек мүмкіндіктер"
-                : "Внутренние новости, конкурсы и больше возможностей"}
-            </p>
+      <section className="bg-primary py-16 lg:py-20">
+        <div className="mx-auto max-w-7xl px-4 lg:px-8">
+          <div className="grid items-center gap-10 lg:grid-cols-2">
+            <div>
+              <h2 className="mb-4 text-balance text-2xl font-bold text-primary-foreground md:text-3xl lg:text-4xl">
+                {isKk ? "Қызметкер порталы" : "Портал сотрудника"}
+              </h2>
+              <p className="mb-8 max-w-lg text-base leading-relaxed text-primary-foreground/75 md:text-lg">
+                {isKk
+                  ? "Ішкі жаңалықтар, конкурстар, құжаттар және Магистральдық желі дирекциясының әр қызметкері үшін көбірек мүмкіндіктер."
+                  : "Внутренние новости, конкурсы, документы и больше возможностей для каждого сотрудника Дирекции магистральной сети."}
+              </p>
+              <div className="flex flex-wrap gap-3">
+                <Link
+                  href="/login"
+                  className="inline-flex h-10 items-center gap-2 rounded-md bg-accent px-6 text-sm font-semibold text-accent-foreground transition-colors hover:bg-accent/90"
+                >
+                  {isKk ? "Порталға кіру" : "Войти в портал"}
+                  <ArrowRight className="ml-1 h-4 w-4" />
+                </Link>
+                <Link
+                  href="/register"
+                  className="inline-flex h-10 items-center rounded-md border border-primary-foreground/30 px-6 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary-foreground/10"
+                >
+                  {isKk ? "Көбірек білу" : "Узнать больше"}
+                </Link>
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              {[
+                { icon: Bell, label: isKk ? "Хабарламалар" : "Уведомления" },
+                { icon: FileText, label: isKk ? "Құжаттар" : "Документы" },
+                { icon: Users, label: isKk ? "Конкурстар" : "Конкурсы" },
+                { icon: Shield, label: isKk ? "Қауіпсіздік" : "Безопасность" },
+              ].map((item) => (
+                <div
+                  key={item.label}
+                  className="flex flex-col items-center gap-3 rounded-xl border border-primary-foreground/10 bg-primary-foreground/10 p-6 backdrop-blur-sm"
+                >
+                  <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-primary-foreground/15">
+                    <item.icon className="h-6 w-6 text-primary-foreground" />
+                  </div>
+                  <span className="text-sm font-medium text-primary-foreground">
+                    {item.label}
+                  </span>
+                </div>
+              ))}
+            </div>
           </div>
-          <Link
-            href="/login"
-            className="inline-flex items-center gap-2 rounded-lg bg-white px-6 py-2.5 text-sm font-bold text-[#003DA5] transition-colors hover:bg-gray-100"
-          >
-            {tc("login")}
-            <ArrowRight className="h-4 w-4" />
-          </Link>
         </div>
       </section>
     </div>

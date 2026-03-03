@@ -1,11 +1,6 @@
-import { useTranslations } from "next-intl";
 import { setRequestLocale } from "next-intl/server";
-import { db } from "@/db";
-import { sanatoriumPages, sanatoriumPrograms, sanatoriumDocuments } from "@/db/schema";
-import { eq } from "drizzle-orm";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Heart, FileText, Download } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Link } from "@/i18n/routing";
+import { Info, CalendarCheck, FileText, BookOpen, ArrowRight } from "lucide-react";
 
 type Props = {
   params: Promise<{ locale: string }>;
@@ -16,144 +11,96 @@ export default async function SanatoriumPage({ params }: Props) {
   setRequestLocale(locale);
   const isKk = locale === "kk";
 
-  let page = null;
-  let programs: Array<typeof sanatoriumPrograms.$inferSelect> = [];
-  let documents: Array<typeof sanatoriumDocuments.$inferSelect> = [];
-
-  try {
-    const [p] = await db
-      .select()
-      .from(sanatoriumPages)
-      .where(eq(sanatoriumPages.status, "published"))
-      .limit(1);
-    page = p || null;
-
-    if (page) {
-      programs = await db
-        .select()
-        .from(sanatoriumPrograms)
-        .where(eq(sanatoriumPrograms.pageId, page.id))
-        .orderBy(sanatoriumPrograms.sortOrder);
-      documents = await db
-        .select()
-        .from(sanatoriumDocuments)
-        .where(eq(sanatoriumDocuments.pageId, page.id));
-    }
-  } catch {
-    // DB not ready
-  }
-
-  return <SanatoriumContent locale={locale} isKk={isKk} page={page} programs={programs} documents={documents} />;
-}
-
-function SanatoriumContent({
-  locale,
-  isKk,
-  page,
-  programs,
-  documents,
-}: {
-  locale: string;
-  isKk: boolean;
-  page: typeof sanatoriumPages.$inferSelect | null;
-  programs: Array<typeof sanatoriumPrograms.$inferSelect>;
-  documents: Array<typeof sanatoriumDocuments.$inferSelect>;
-}) {
-  const t = useTranslations("sanatorium");
+  const cards = [
+    {
+      href: "/sanatorium/info",
+      icon: Info,
+      iconBg: "bg-blue-50",
+      iconColor: "text-blue-600",
+      title: isKk
+        ? "Санаториялық-курорттық сауықтыру туралы ақпарат"
+        : "Информация о санаторно-курортном оздоровлении",
+      description: isKk
+        ? "Санаториялық-курорттық сауықтыру бағдарламасы туралы толық ақпарат"
+        : "Полная информация о программе санаторно-курортного оздоровления",
+    },
+    {
+      href: "/sanatorium/quota",
+      icon: CalendarCheck,
+      iconBg: "bg-emerald-50",
+      iconColor: "text-emerald-600",
+      title: isKk ? "Санаторийге квота" : "Квота на санаторий",
+      description: isKk
+        ? "Санаторийге квота бөлу тәртібі мен шарттары"
+        : "Порядок и условия распределения квот на санаторий",
+    },
+    {
+      href: "/sanatorium/application-form",
+      icon: FileText,
+      iconBg: "bg-amber-50",
+      iconColor: "text-amber-600",
+      title: isKk ? "Өтініш үлгісі" : "Образец заявления",
+      description: isKk
+        ? "Санаториялық сауықтыруға өтініш беру үлгісі"
+        : "Образец заявления на санаторно-курортное оздоровление",
+    },
+    {
+      href: "/sanatorium/memo",
+      icon: BookOpen,
+      iconBg: "bg-purple-50",
+      iconColor: "text-purple-600",
+      title: isKk
+        ? "Санаториялық-курорттық сауықтыру туралы жадынама"
+        : "Памятка о санаторно-курортном оздоровлении",
+      description: isKk
+        ? "Қызметкерлерге арналған маңызды ақпарат пен нұсқаулықтар"
+        : "Важная информация и инструкции для сотрудников",
+    },
+  ];
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="mb-6 border-b-2 border-[#003DA5] pb-3">
-        <h1 className="text-2xl font-bold text-[#003DA5]">{t("title")}</h1>
-        <p className="mt-1 text-sm text-gray-500">{t("description")}</p>
+    <div className="container mx-auto max-w-4xl px-4 py-8">
+      <div className="mb-8">
+        <p className="mb-2 text-sm font-semibold uppercase tracking-wider text-accent">
+          {isKk ? "Сервистер" : "Сервисы"}
+        </p>
+        <h1 className="text-2xl font-bold text-[#003DA5] sm:text-3xl">
+          {isKk ? "Санаториялық-курорттық сауықтыру" : "Санаторно-курортное оздоровление"}
+        </h1>
+        <p className="mt-2 text-sm text-muted-foreground">
+          {isKk
+            ? "Қызметкерлер мен олардың отбасыларына арналған сауықтыру бағдарламалары"
+            : "Программы оздоровления для сотрудников и их семей"}
+        </p>
       </div>
 
-      {page ? (
-        <>
-          {page.coverImageUrl && (
-            <div className="mb-8 overflow-hidden rounded-xl">
-              <img
-                src={page.coverImageUrl}
-                alt={isKk ? page.titleKk : page.titleRu}
-                className="h-[300px] w-full object-cover"
-              />
+      <div className="grid gap-4 sm:grid-cols-2">
+        {cards.map((card) => (
+          <Link
+            key={card.href}
+            href={card.href}
+            className="group flex items-start gap-4 rounded-xl border border-border bg-card p-6 transition-all duration-300 hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5"
+          >
+            <div
+              className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-lg ${card.iconBg} ${card.iconColor}`}
+            >
+              <card.icon className="h-6 w-6" />
             </div>
-          )}
-
-          <div
-            className="prose max-w-none mb-12"
-            dangerouslySetInnerHTML={{
-              __html: isKk ? page.contentKk : page.contentRu,
-            }}
-          />
-
-          {/* Programs */}
-          {programs.length > 0 && (
-            <section className="mb-12">
-              <h2 className="mb-6 text-2xl font-bold text-[#003DA5]">{t("programs")}</h2>
-              <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-                {programs.map((prog) => (
-                  <Card key={prog.id} className="overflow-hidden">
-                    {prog.imageUrl && (
-                      <img
-                        src={prog.imageUrl}
-                        alt={isKk ? prog.nameKk : prog.nameRu}
-                        className="h-48 w-full object-cover"
-                      />
-                    )}
-                    <CardHeader>
-                      <CardTitle className="text-lg">
-                        {isKk ? prog.nameKk : prog.nameRu}
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <p className="text-sm text-muted-foreground">
-                        {isKk ? prog.descKk : prog.descRu}
-                      </p>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
-            </section>
-          )}
-
-          {/* Documents */}
-          {documents.length > 0 && (
-            <section>
-              <h2 className="mb-6 text-2xl font-bold text-[#003DA5]">{t("documents")}</h2>
-              <div className="space-y-3">
-                {documents.map((doc) => (
-                  <a
-                    key={doc.id}
-                    href={doc.fileUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center gap-3 rounded-lg border p-4 transition-colors hover:bg-secondary"
-                  >
-                    <FileText className="h-5 w-5 shrink-0 text-[#003DA5]" />
-                    <span className="flex-1 font-medium">
-                      {isKk ? doc.titleKk : doc.titleRu}
-                    </span>
-                    {doc.fileSize && (
-                      <span className="text-sm text-muted-foreground">
-                        {(doc.fileSize / 1024).toFixed(0)} KB
-                      </span>
-                    )}
-                    <Download className="h-4 w-4 text-muted-foreground" />
-                  </a>
-                ))}
-              </div>
-            </section>
-          )}
-        </>
-      ) : (
-        <div className="rounded-lg border border-dashed border-gray-300 p-12 text-center">
-          <Heart className="mx-auto mb-4 h-12 w-12 text-gray-300" />
-          <p className="text-muted-foreground">
-            {isKk ? "Ақпарат жақында қосылады" : "Информация скоро появится"}
-          </p>
-        </div>
-      )}
+            <div className="min-w-0 flex-1">
+              <h2 className="text-sm font-bold text-foreground transition-colors group-hover:text-primary">
+                {card.title}
+              </h2>
+              <p className="mt-1 text-xs text-muted-foreground">
+                {card.description}
+              </p>
+              <span className="mt-3 inline-flex items-center gap-1 text-xs font-medium text-primary opacity-0 transition-opacity group-hover:opacity-100">
+                {isKk ? "Толығырақ" : "Подробнее"}
+                <ArrowRight className="h-3 w-3" />
+              </span>
+            </div>
+          </Link>
+        ))}
+      </div>
     </div>
   );
 }

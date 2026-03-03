@@ -5,14 +5,12 @@ import { Link, usePathname } from "@/i18n/routing";
 import { useLocale } from "next-intl";
 import { useState } from "react";
 import {
-  Train,
   Menu,
-  X,
   Globe,
-  LogIn,
+  Search,
   User,
   ChevronDown,
-  Search,
+  LogIn,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -32,6 +30,14 @@ import {
 import { signOut } from "next-auth/react";
 
 const navItems = [
+  { key: "home", href: "/" },
+  { key: "news", href: "/news" },
+  { key: "services", href: "#services" },
+  { key: "partners", href: "#partners" },
+  { key: "contacts", href: "#footer" },
+] as const;
+
+const mobileNavItems = [
   { key: "news", href: "/news" },
   { key: "sanatorium", href: "/sanatorium" },
   { key: "vacancies", href: "/vacancies" },
@@ -39,6 +45,7 @@ const navItems = [
   { key: "faq", href: "/reorganization-faq" },
   { key: "beautyContest", href: "/beauty-contest" },
   { key: "sports", href: "/sports" },
+  { key: "zhylyZhurekpen", href: "/zhyly-zhurekpen" },
 ] as const;
 
 export function Header() {
@@ -48,36 +55,97 @@ export function Header() {
   const pathname = usePathname();
   const [mobileOpen, setMobileOpen] = useState(false);
   const { data: session } = useSession();
+  const isKk = locale === "kk";
 
   const otherLocale = locale === "kk" ? "ru" : "kk";
-  const otherLocaleName = locale === "kk" ? "Русский" : "Қазақша";
 
   return (
-    <header className="sticky top-0 z-50">
-      {/* Top utility bar */}
-      <div className="border-b border-[#002D7A] bg-[#003DA5] text-white">
-        <div className="container mx-auto flex items-center justify-between px-4 py-2">
-          <div className="flex items-center gap-6 text-sm">
-            <span className="hidden text-blue-200 sm:inline">{tc("companyName")}</span>
-          </div>
-          <div className="flex items-center gap-4 text-sm">
+    <header className="sticky top-0 z-50 border-b border-border bg-card/80 backdrop-blur-xl">
+      <div className="mx-auto max-w-7xl px-4 lg:px-8">
+        <div className="flex h-20 items-center justify-between">
+          {/* Logo */}
+          <Link href="/" className="group flex items-center gap-2">
+            <img
+              src={isKk ? "/czhs-logo-kk.png" : "/czhs-logo-ru.png"}
+              alt={isKk ? "Қазақстан Темір Жолы — Магистральдық желі дирекциясы" : "Қазақстан Темір Жолы — Дирекция магистральной сети"}
+              className="h-[120px] w-auto object-contain"
+            />
+            <div className="hidden sm:block">
+              <p className="text-[10px] leading-tight text-muted-foreground">
+                {isKk
+                  ? "«ҚТЖ» ҰК» АҚ филиалы — Магистральдық желі дирекциясы"
+                  : "Филиал АО «НК «ҚТЖ» — Дирекция магистральной сети"}
+              </p>
+              <p className="text-[10px] leading-tight text-muted-foreground">
+                {isKk
+                  ? "Инфрақұрылымның ұлттық операторы"
+                  : "Национальный оператор инфраструктуры"}
+              </p>
+            </div>
+          </Link>
+
+          {/* Desktop Navigation */}
+          <nav className="hidden items-center gap-1 lg:flex">
+            {navItems.map((item) => (
+              <Link
+                key={item.key}
+                href={item.href}
+                className={`rounded-md px-3 py-2 text-sm font-medium transition-colors hover:bg-secondary hover:text-foreground ${
+                  pathname === item.href
+                    ? "text-foreground"
+                    : "text-muted-foreground"
+                }`}
+              >
+                {item.key === "home"
+                  ? tc("home")
+                  : item.key === "news"
+                    ? t("news")
+                    : item.key === "services"
+                      ? isKk ? "Сервистер" : "Сервисы"
+                      : item.key === "partners"
+                        ? isKk ? "Серіктестер" : "Партнёры"
+                        : isKk ? "Байланыс" : "Контакты"}
+              </Link>
+            ))}
+          </nav>
+
+          {/* Right side actions */}
+          <div className="flex items-center gap-2">
+            {/* Search */}
+            <Button
+              variant="ghost"
+              size="icon"
+              className="hidden text-muted-foreground hover:text-foreground md:flex"
+            >
+              <Search className="h-4 w-4" />
+              <span className="sr-only">{tc("search")}</span>
+            </Button>
+
+            {/* Language Switcher */}
             <Link
               href={pathname}
               locale={otherLocale}
-              className="flex items-center gap-1.5 rounded px-2 py-1 font-medium transition-colors hover:bg-white/10"
+              className="hidden items-center gap-1.5 rounded-md px-3 py-2 text-sm text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground md:flex"
             >
-              <Globe className="h-3.5 w-3.5" />
-              {otherLocaleName}
+              <Globe className="h-4 w-4" />
+              <span className="text-xs">{locale === "kk" ? "RU" : "ҚАЗ"}</span>
             </Link>
-            <div className="h-4 w-px bg-white/20" />
+
+            {/* Auth */}
             {session ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <button className="flex items-center gap-1.5 rounded px-2 py-1 font-medium transition-colors hover:bg-white/10">
-                    <User className="h-3.5 w-3.5" />
-                    <span className="hidden sm:inline">{session.user.name}</span>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="hidden items-center gap-1.5 md:inline-flex"
+                  >
+                    <User className="h-4 w-4" />
+                    <span className="max-w-[100px] truncate text-xs">
+                      {session.user.name}
+                    </span>
                     <ChevronDown className="h-3 w-3" />
-                  </button>
+                  </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
                   <DropdownMenuItem asChild>
@@ -101,93 +169,82 @@ export function Header() {
                 </DropdownMenuContent>
               </DropdownMenu>
             ) : (
-              <Link
-                href="/login"
-                className="flex items-center gap-1.5 rounded px-2 py-1 font-medium transition-colors hover:bg-white/10"
+              <Button
+                asChild
+                size="sm"
+                className="hidden gap-1.5 md:inline-flex"
               >
-                <LogIn className="h-3.5 w-3.5" />
-                {tc("login")}
-              </Link>
+                <Link href="/login">{tc("login")}</Link>
+              </Button>
             )}
+
+            {/* Mobile Menu */}
+            <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
+              <SheetTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="text-muted-foreground lg:hidden"
+                >
+                  <Menu className="h-5 w-5" />
+                  <span className="sr-only">Меню</span>
+                </Button>
+              </SheetTrigger>
+              <SheetContent side="right" className="w-80">
+                <SheetTitle className="text-foreground">
+                  {isKk ? "Магистральдық желі дирекциясы" : "Дирекция магистральной сети"}
+                </SheetTitle>
+                <nav className="mt-6 flex flex-col gap-1">
+                  {mobileNavItems.map((item) => (
+                    <Link
+                      key={item.key}
+                      href={item.href}
+                      onClick={() => setMobileOpen(false)}
+                      className={`rounded-md px-4 py-3 text-sm font-medium transition-colors hover:bg-secondary ${
+                        pathname === item.href
+                          ? "bg-primary/10 font-semibold text-primary"
+                          : "text-foreground"
+                      }`}
+                    >
+                      {t(item.key)}
+                    </Link>
+                  ))}
+                </nav>
+                <div className="mt-6 flex flex-col gap-3 border-t border-border pt-6">
+                  <Link
+                    href={pathname}
+                    locale={otherLocale}
+                    onClick={() => setMobileOpen(false)}
+                    className="flex items-center gap-2 px-4 py-2 text-sm text-muted-foreground"
+                  >
+                    <Globe className="h-4 w-4" />
+                    {locale === "kk" ? "Русский" : "Қазақша"}
+                  </Link>
+                  {session ? (
+                    <Link
+                      href="/portal"
+                      onClick={() => setMobileOpen(false)}
+                      className="flex items-center gap-2 px-4 py-2 text-sm text-muted-foreground"
+                    >
+                      <User className="h-4 w-4" />
+                      {tc("portal")}
+                    </Link>
+                  ) : (
+                    <Link
+                      href="/login"
+                      onClick={() => setMobileOpen(false)}
+                      className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-primary"
+                    >
+                      <LogIn className="h-4 w-4" />
+                      {tc("login")}
+                    </Link>
+                  )}
+                </div>
+              </SheetContent>
+            </Sheet>
           </div>
         </div>
       </div>
-
-      {/* Logo + Site Name bar */}
-      <div className="border-b border-gray-200 bg-white">
-        <div className="container mx-auto flex items-center justify-between px-4">
-          <Link href="/" className="flex items-center gap-3">
-            <img
-              src={locale === "kk" ? "/logo-kk.png" : "/logo-ru.png"}
-              alt={locale === "kk" ? "ҚТЖ" : "КТЖ"}
-              className="h-[80px] w-auto object-contain"
-            />
-            <div>
-              <h1 className="text-sm font-bold leading-tight text-[#003DA5] sm:text-lg">
-                {tc("appFullName")}
-              </h1>
-              <p className="hidden text-xs text-gray-500 sm:block">
-                {locale === "kk" ? "Ақпараттық портал" : "Информационный портал"}
-              </p>
-            </div>
-          </Link>
-
-          {/* Mobile menu trigger */}
-          <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
-            <SheetTrigger asChild className="lg:hidden">
-              <Button variant="outline" size="icon">
-                <Menu className="h-5 w-5" />
-              </Button>
-            </SheetTrigger>
-            <SheetContent side="right" className="w-80">
-              <SheetTitle className="text-[#003DA5]">
-                {tc("appFullName")}
-              </SheetTitle>
-              <nav className="mt-6 flex flex-col gap-1">
-                {navItems.map((item) => (
-                  <Link
-                    key={item.key}
-                    href={item.href}
-                    onClick={() => setMobileOpen(false)}
-                    className={`rounded-md px-4 py-3 text-sm font-medium transition-colors hover:bg-gray-100 ${
-                      pathname === item.href
-                        ? "bg-[#003DA5]/10 font-semibold text-[#003DA5]"
-                        : "text-gray-700"
-                    }`}
-                  >
-                    {t(item.key)}
-                  </Link>
-                ))}
-              </nav>
-            </SheetContent>
-          </Sheet>
-        </div>
-      </div>
-
-      {/* Main navigation bar */}
-      <nav className="hidden border-b border-gray-200 bg-gray-50 lg:block">
-        <div className="container mx-auto px-4">
-          <ul className="flex items-center gap-0">
-            {navItems.map((item) => (
-              <li key={item.key}>
-                <Link
-                  href={item.href}
-                  className={`relative block px-4 py-3 text-sm font-medium transition-colors hover:text-[#003DA5] ${
-                    pathname === item.href
-                      ? "text-[#003DA5]"
-                      : "text-gray-600"
-                  }`}
-                >
-                  {t(item.key)}
-                  {pathname === item.href && (
-                    <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#003DA5]" />
-                  )}
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </div>
-      </nav>
     </header>
   );
 }
