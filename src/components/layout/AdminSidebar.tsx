@@ -30,6 +30,7 @@ import {
 } from "@/components/ui/sheet";
 import { hasPermission, ADMIN_NAV_ITEMS, type UserRole } from "@/lib/permissions";
 import { useAdminLocale } from "@/components/providers/AdminLocaleProvider";
+import type { AdminLocale } from "@/lib/admin-i18n";
 import { useState } from "react";
 
 const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
@@ -70,11 +71,11 @@ function SidebarContent({
 }: {
   collapsed: boolean;
   setCollapsed?: (v: boolean) => void;
-  navItems: typeof ADMIN_NAV_ITEMS;
+  navItems: typeof ADMIN_NAV_ITEMS[number][];
   pathname: string;
   userName: string;
-  locale: string;
-  setLocale: (l: string) => void;
+  locale: AdminLocale;
+  setLocale: (l: AdminLocale) => void;
   t: (key: string) => string;
   onNavClick?: () => void;
 }) {

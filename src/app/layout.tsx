@@ -19,6 +19,13 @@ export const metadata: Metadata = {
   },
   description:
     "\"ҚТЖ\" ҰК\" АҚ Магистральдық желі дирекциясы - корпоративтік ақпараттық портал",
+  manifest: "/manifest.json",
+  themeColor: "#003DA5",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "ЦЖС Порталы",
+  },
 };
 
 export default function RootLayout({
@@ -31,6 +38,7 @@ export default function RootLayout({
       <head>
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
       </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} font-sans antialiased`}
