@@ -197,7 +197,7 @@ function HomeContent({
         {/* Stats Bar */}
         <div className="bg-primary">
           <div className="mx-auto max-w-7xl px-4 lg:px-8">
-            <div className="grid grid-cols-3 divide-x divide-primary-foreground/15">
+            <div className="grid grid-cols-1 divide-y divide-primary-foreground/15 sm:grid-cols-3 sm:divide-x sm:divide-y-0">
               {[
                 { value: ">55 000", label: isKk ? "Қызметкер" : "Работников" },
                 { value: ">21 000", label: isKk ? "Километр — ел теміржолдарының ұзындығы" : "Километров составляет протяжённость железных дорог страны" },

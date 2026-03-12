@@ -68,7 +68,7 @@ export function Header() {
             <img
               src={isKk ? "/czhs-logo-kk.png" : "/czhs-logo-ru.png"}
               alt={isKk ? "Қазақстан Темір Жолы — Магистральдық желі дирекциясы" : "Қазақстан Темір Жолы — Дирекция магистральной сети"}
-              className="h-[120px] w-auto object-contain"
+              className="h-[80px] w-auto object-contain md:h-[100px] lg:h-[120px]"
             />
             <div className="hidden sm:block">
               <p className="text-[10px] leading-tight text-muted-foreground">
@@ -190,7 +190,7 @@ export function Header() {
                   <span className="sr-only">Меню</span>
                 </Button>
               </SheetTrigger>
-              <SheetContent side="right" className="w-80">
+              <SheetContent side="right" className="w-[85vw] max-w-80">
                 <SheetTitle className="text-foreground">
                   {isKk ? "Магистральдық желі дирекциясы" : "Дирекция магистральной сети"}
                 </SheetTitle>

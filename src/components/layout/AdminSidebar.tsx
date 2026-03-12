@@ -19,8 +19,15 @@ import {
   ChevronLeft,
   Home,
   Globe,
+  Menu,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import {
+  Sheet,
+  SheetContent,
+  SheetTrigger,
+  SheetTitle,
+} from "@/components/ui/sheet";
 import { hasPermission, ADMIN_NAV_ITEMS, type UserRole } from "@/lib/permissions";
 import { useAdminLocale } from "@/components/providers/AdminLocaleProvider";
 import { useState } from "react";
@@ -50,28 +57,29 @@ const sidebarKeyMap: Record<string, string> = {
   settings: "sidebar.settings",
 };
 
-export function AdminSidebar({
-  userRole,
+function SidebarContent({
+  collapsed,
+  setCollapsed,
+  navItems,
+  pathname,
   userName,
+  locale,
+  setLocale,
+  t,
+  onNavClick,
 }: {
-  userRole: UserRole;
+  collapsed: boolean;
+  setCollapsed?: (v: boolean) => void;
+  navItems: typeof ADMIN_NAV_ITEMS;
+  pathname: string;
   userName: string;
+  locale: string;
+  setLocale: (l: string) => void;
+  t: (key: string) => string;
+  onNavClick?: () => void;
 }) {
-  const pathname = usePathname();
-  const [collapsed, setCollapsed] = useState(false);
-  const { locale, setLocale, t } = useAdminLocale();
-
-  const navItems = ADMIN_NAV_ITEMS.filter((item) => {
-    if (item.superAdminOnly && userRole !== "super_admin") return false;
-    return hasPermission(userRole, item.permission);
-  });
-
   return (
-    <aside
-      className={`sticky top-0 flex h-screen flex-col border-r border-sidebar-border bg-[#0A1628] text-sidebar-foreground transition-all ${
-        collapsed ? "w-16" : "w-64"
-      }`}
-    >
+    <>
       {/* Header */}
       <div className="flex items-center gap-3 border-b border-sidebar-border p-4">
         <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[#003DA5]">
@@ -82,14 +90,16 @@ export function AdminSidebar({
             <p className="truncate text-sm font-bold text-white">{t("sidebar.title")}</p>
           </div>
         )}
-        <Button
-          variant="ghost"
-          size="icon"
-          className="ml-auto h-6 w-6 shrink-0 text-gray-400 hover:text-white"
-          onClick={() => setCollapsed(!collapsed)}
-        >
-          <ChevronLeft className={`h-4 w-4 transition-transform ${collapsed ? "rotate-180" : ""}`} />
-        </Button>
+        {setCollapsed && (
+          <Button
+            variant="ghost"
+            size="icon"
+            className="ml-auto h-6 w-6 shrink-0 text-gray-400 hover:text-white"
+            onClick={() => setCollapsed(!collapsed)}
+          >
+            <ChevronLeft className={`h-4 w-4 transition-transform ${collapsed ? "rotate-180" : ""}`} />
+          </Button>
+        )}
       </div>
 
       {/* Language switcher */}
@@ -143,6 +153,7 @@ export function AdminSidebar({
               <li key={item.href}>
                 <Link
                   href={item.href}
+                  onClick={onNavClick}
                   className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors ${
                     isActive
                       ? "bg-sidebar-accent text-white"
@@ -166,6 +177,7 @@ export function AdminSidebar({
         )}
         <Link
           href="/kk"
+          onClick={onNavClick}
           className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm text-gray-400 transition-colors hover:bg-sidebar-accent/50 hover:text-white"
           title={collapsed ? t("sidebar.home") : undefined}
         >
@@ -181,6 +193,76 @@ export function AdminSidebar({
           {!collapsed && <span>{t("sidebar.logout")}</span>}
         </button>
       </div>
-    </aside>
+    </>
+  );
+}
+
+export function AdminSidebar({
+  userRole,
+  userName,
+}: {
+  userRole: UserRole;
+  userName: string;
+}) {
+  const pathname = usePathname();
+  const [collapsed, setCollapsed] = useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const { locale, setLocale, t } = useAdminLocale();
+
+  const navItems = ADMIN_NAV_ITEMS.filter((item) => {
+    if (item.superAdminOnly && userRole !== "super_admin") return false;
+    return hasPermission(userRole, item.permission);
+  });
+
+  return (
+    <>
+      {/* Mobile header bar */}
+      <div className="sticky top-0 z-40 flex items-center gap-3 border-b border-border bg-[#0A1628] p-3 md:hidden">
+        <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
+          <SheetTrigger asChild>
+            <Button variant="ghost" size="icon" className="text-white hover:bg-white/10">
+              <Menu className="h-5 w-5" />
+            </Button>
+          </SheetTrigger>
+          <SheetContent side="left" className="w-[85vw] max-w-[280px] bg-[#0A1628] p-0 text-sidebar-foreground">
+            <SheetTitle className="sr-only">{t("sidebar.title")}</SheetTitle>
+            <div className="flex h-full flex-col">
+              <SidebarContent
+                collapsed={false}
+                navItems={navItems}
+                pathname={pathname}
+                userName={userName}
+                locale={locale}
+                setLocale={setLocale}
+                t={t}
+                onNavClick={() => setMobileOpen(false)}
+              />
+            </div>
+          </SheetContent>
+        </Sheet>
+        <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-[#003DA5]">
+          <Train className="h-4 w-4 text-white" />
+        </div>
+        <p className="truncate text-sm font-bold text-white">{t("sidebar.title")}</p>
+      </div>
+
+      {/* Desktop sidebar */}
+      <aside
+        className={`sticky top-0 hidden h-screen flex-col border-r border-sidebar-border bg-[#0A1628] text-sidebar-foreground transition-all md:flex ${
+          collapsed ? "w-16" : "w-64"
+        }`}
+      >
+        <SidebarContent
+          collapsed={collapsed}
+          setCollapsed={setCollapsed}
+          navItems={navItems}
+          pathname={pathname}
+          userName={userName}
+          locale={locale}
+          setLocale={setLocale}
+          t={t}
+        />
+      </aside>
+    </>
   );
 }

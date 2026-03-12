@@ -51,8 +51,8 @@ export function NewsListClient({ articles }: { articles: Article[] }) {
             <TableRow>
               <TableHead>{t("news.heading")}</TableHead>
               <TableHead className="w-28">{t("news.status")}</TableHead>
-              <TableHead className="w-24">{t("news.views")}</TableHead>
-              <TableHead className="w-32">{t("news.date")}</TableHead>
+              <TableHead className="hidden w-24 md:table-cell">{t("news.views")}</TableHead>
+              <TableHead className="hidden w-32 sm:table-cell">{t("news.date")}</TableHead>
               <TableHead className="w-20">{t("news.action")}</TableHead>
             </TableRow>
           </TableHeader>
@@ -74,8 +74,8 @@ export function NewsListClient({ articles }: { articles: Article[] }) {
                     {article.status}
                   </Badge>
                 </TableCell>
-                <TableCell>{article.viewCount}</TableCell>
-                <TableCell className="text-sm text-muted-foreground">
+                <TableCell className="hidden md:table-cell">{article.viewCount}</TableCell>
+                <TableCell className="hidden text-sm text-muted-foreground sm:table-cell">
                   {new Date(article.createdAt).toLocaleDateString("ru-RU")}
                 </TableCell>
                 <TableCell>
