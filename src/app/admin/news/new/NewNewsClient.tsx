@@ -78,18 +78,13 @@ export function NewNewsClient({ categories, allTags = [] }: { categories: Catego
   };
 
   const handleSubmit = (status: "draft" | "published") => {
-    if (!titleKk || !titleRu) {
+    if (!titleKk && !titleRu) {
       toast.error(locale === "kk" ? "Тақырыпты толтырыңыз" : "Заполните заголовок");
       return;
     }
 
     const contentKk = blocksToHtml(blocksKk);
     const contentRu = blocksToHtml(blocksRu);
-
-    if (!contentKk && !contentRu) {
-      toast.error(locale === "kk" ? "Мазмұнды толтырыңыз" : "Добавьте содержание");
-      return;
-    }
 
     let scheduledAt: string | undefined;
     if (useSchedule && scheduleDate && status === "published") {
@@ -100,12 +95,12 @@ export function NewNewsClient({ categories, allTags = [] }: { categories: Catego
     startTransition(async () => {
       try {
         await createNewsArticle({
-          titleKk,
-          titleRu,
+          titleKk: titleKk || titleRu,
+          titleRu: titleRu || titleKk,
           excerptKk: excerptKk || undefined,
           excerptRu: excerptRu || undefined,
-          contentKk: contentKk || titleKk,
-          contentRu: contentRu || titleRu,
+          contentKk: contentKk || contentRu || titleKk || titleRu,
+          contentRu: contentRu || contentKk || titleRu || titleKk,
           coverImageUrlKk: coverImageUrlKk || undefined,
           coverImageUrlRu: coverImageUrlRu || undefined,
           categoryId: categoryId !== "none" ? categoryId : undefined,
