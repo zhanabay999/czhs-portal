@@ -55,38 +55,56 @@ function PhotoPositionEditor({
   const containerRef = useRef<HTMLDivElement>(null);
   const isDragging = useRef(false);
 
-  // Parse current position "X% Y%" → [x, y]
-  const [x, y] = position.split(" ").map((v) => parseFloat(v) || 50);
+  // Local state for smooth visual feedback during drag — parent updated only on mouseUp
+  const [localPos, setLocalPos] = useState(position);
+  const [lx, ly] = localPos.split(" ").map((v) => parseFloat(v) || 50);
 
-  const applyPos = useCallback(
-    (clientX: number, clientY: number) => {
-      const el = containerRef.current;
-      if (!el) return;
-      const rect = el.getBoundingClientRect();
-      const nx = Math.max(0, Math.min(100, ((clientX - rect.left) / rect.width) * 100));
-      const ny = Math.max(0, Math.min(100, ((clientY - rect.top) / rect.height) * 100));
-      onChange(`${Math.round(nx)}% ${Math.round(ny)}%`);
-    },
-    [onChange]
-  );
+  const calcPos = useCallback((clientX: number, clientY: number): string => {
+    const el = containerRef.current;
+    if (!el) return localPos;
+    const rect = el.getBoundingClientRect();
+    const nx = Math.max(0, Math.min(100, ((clientX - rect.left) / rect.width) * 100));
+    const ny = Math.max(0, Math.min(100, ((clientY - rect.top) / rect.height) * 100));
+    return `${Math.round(nx)}% ${Math.round(ny)}%`;
+  }, [localPos]);
 
   const onMouseDown = (e: React.MouseEvent) => {
     isDragging.current = true;
-    applyPos(e.clientX, e.clientY);
+    const p = calcPos(e.clientX, e.clientY);
+    setLocalPos(p);
   };
   const onMouseMove = (e: React.MouseEvent) => {
     if (!isDragging.current) return;
-    applyPos(e.clientX, e.clientY);
+    setLocalPos(calcPos(e.clientX, e.clientY));
   };
-  const onMouseUp = () => { isDragging.current = false; };
+  const onMouseUp = (e: React.MouseEvent) => {
+    if (!isDragging.current) return;
+    isDragging.current = false;
+    const p = calcPos(e.clientX, e.clientY);
+    setLocalPos(p);
+    onChange(p); // commit to parent only once, on release
+  };
+  const onMouseLeave = () => {
+    if (isDragging.current) {
+      isDragging.current = false;
+      onChange(localPos);
+    }
+  };
 
   const onTouchStart = (e: React.TouchEvent) => {
     const t = e.touches[0];
-    applyPos(t.clientX, t.clientY);
+    const p = calcPos(t.clientX, t.clientY);
+    setLocalPos(p);
   };
   const onTouchMove = (e: React.TouchEvent) => {
     const t = e.touches[0];
-    applyPos(t.clientX, t.clientY);
+    setLocalPos(calcPos(t.clientX, t.clientY));
+  };
+  const onTouchEnd = (e: React.TouchEvent) => {
+    const t = e.changedTouches[0];
+    const p = calcPos(t.clientX, t.clientY);
+    setLocalPos(p);
+    onChange(p);
   };
 
   return (
@@ -102,9 +120,10 @@ function PhotoPositionEditor({
           onMouseDown={onMouseDown}
           onMouseMove={onMouseMove}
           onMouseUp={onMouseUp}
-          onMouseLeave={onMouseUp}
+          onMouseLeave={onMouseLeave}
           onTouchStart={onTouchStart}
           onTouchMove={onTouchMove}
+          onTouchEnd={onTouchEnd}
         >
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
@@ -112,12 +131,12 @@ function PhotoPositionEditor({
             alt=""
             className="pointer-events-none absolute inset-0 h-full w-full object-cover"
             draggable={false}
-            style={{ objectPosition: position }}
+            style={{ objectPosition: localPos }}
           />
           {/* Crosshair indicator */}
           <div
             className="pointer-events-none absolute h-5 w-5 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-white bg-ktz-blue/60 shadow"
-            style={{ left: `${x}%`, top: `${y}%` }}
+            style={{ left: `${lx}%`, top: `${ly}%` }}
           />
           <p className="pointer-events-none absolute bottom-1 left-0 right-0 text-center text-[10px] text-white drop-shadow">
             {locale === "kk" ? "нүктені жылжытыңыз" : "тащите точку"}
@@ -132,7 +151,7 @@ function PhotoPositionEditor({
               alt=""
               className="pointer-events-none absolute inset-0 h-full w-full object-cover"
               draggable={false}
-              style={{ objectPosition: position }}
+              style={{ objectPosition: localPos }}
             />
           </div>
           <p className="text-[10px] text-muted-foreground">
