@@ -18,7 +18,22 @@ const roleColors: Record<string, string> = {
   contest_manager: "bg-pink-100 text-pink-800",
   sports_manager: "bg-green-100 text-green-800",
   moderator: "bg-cyan-100 text-cyan-800",
+  news_moderator: "bg-indigo-100 text-indigo-800",
+  social_admin: "bg-emerald-100 text-emerald-800",
   employee: "bg-gray-100 text-gray-800",
+};
+
+const roleLabels: Record<string, string> = {
+  super_admin: "Супер Админ",
+  admin: "Администратор",
+  content_manager: "Контент-менеджер",
+  hr_manager: "HR менеджер",
+  contest_manager: "Менеджер конкурсов",
+  sports_manager: "Менеджер спорта",
+  moderator: "Модератор",
+  news_moderator: "Модератор новостей",
+  social_admin: "Админ Жылы Жүрекпен",
+  employee: "Сотрудник",
 };
 
 type User = {
@@ -180,7 +195,7 @@ export function UsersClient({ users, pendingUsers }: { users: User[]; pendingUse
                 <TableCell>{user.email}</TableCell>
                 <TableCell>
                   <Badge className={roleColors[user.role] || "bg-gray-100"}>
-                    {user.role}
+                    {roleLabels[user.role] || user.role}
                   </Badge>
                 </TableCell>
                 <TableCell className="text-sm">{user.department || "—"}</TableCell>

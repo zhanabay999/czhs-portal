@@ -28,7 +28,12 @@
       "Bash(python -c:*)",
       "Bash(PYTHONIOENCODING=utf-8 python -X utf8 -c:*)",
       "WebFetch(domain:czhs-portal.vercel.app)",
-      "Bash(python3:*)"
+      "Bash(python3:*)",
+      "Bash(gh repo list:*)",
+      "Bash(where:*)",
+      "Bash(find /c/CZHS/src/app/[locale]/\\\\\\(public\\\\\\) -type f -name \"page.tsx\")",
+      "Bash(xargs grep -l \"session.user.role\\\\|canAccessAdmin\\\\|hasPermission\")",
+      "Bash(wc -l c:/CZHS/src/app/\\\\[locale\\\\]/page.tsx)"
     ]
   }
 }

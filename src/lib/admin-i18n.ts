@@ -143,6 +143,41 @@ const t: Record<string, Record<AdminLocale, string>> = {
   "settings.subtitle": { kk: "Сайт баптаулары", ru: "Настройки сайта" },
   "settings.desc": { kk: "Логотип, баннер, байланыс ақпараты", ru: "Логотип, баннер, контактная информация" },
 
+  // News extended
+  "news.search": { kk: "Жаңалық іздеу...", ru: "Поиск по новостям..." },
+  "news.archive": { kk: "Мұрағатқа жіберу", ru: "Архивировать" },
+  "news.archived": { kk: "Мұрағатталды", ru: "Архивировано" },
+  "news.noResults": { kk: "Іздеу нәтижесі жоқ", ru: "Ничего не найдено" },
+  "news.category": { kk: "Санат", ru: "Рубрика" },
+  "news.noCategory": { kk: "Санатсыз", ru: "Без рубрики" },
+  "news.statsAll": { kk: "Барлығы", ru: "Всего" },
+  "news.statsPublished": { kk: "Жарияланған", ru: "Опубликовано" },
+  "news.statsDraft": { kk: "Жобалар", ru: "Черновики" },
+  "news.statsArchived": { kk: "Мұрағат", ru: "Архив" },
+
+  // News form extended
+  "newsForm.editTitle": { kk: "Жаңалықты өңдеу", ru: "Редактирование новости" },
+  "newsForm.preview": { kk: "Қарау", ru: "Просмотр" },
+  "newsForm.coverPreview": { kk: "Мұқаба суретін алдын ала қарау", ru: "Предпросмотр обложки" },
+  "newsForm.internalHint": { kk: "Тек қызметкерлерге көрінеді", ru: "Видна только сотрудникам" },
+  "newsForm.pinnedHint": { kk: "Жаңалықтар тізімінде жоғарыда", ru: "Наверху в ленте новостей" },
+  "newsForm.saved": { kk: "Сақталды", ru: "Сохранено" },
+  "newsForm.confirmArchive": { kk: "Мұрағатқа жіберу?", ru: "Архивировать эту новость?" },
+  "newsForm.viewCount": { kk: "Қаралым", ru: "Просмотров" },
+  "newsForm.createdAt": { kk: "Жасалды", ru: "Создано" },
+
+  // Role labels
+  "roles.super_admin": { kk: "Супер Админ", ru: "Супер Админ" },
+  "roles.admin": { kk: "Әкімші", ru: "Администратор" },
+  "roles.content_manager": { kk: "Контент менеджер", ru: "Контент-менеджер" },
+  "roles.hr_manager": { kk: "HR менеджер", ru: "HR менеджер" },
+  "roles.contest_manager": { kk: "Конкурс менеджері", ru: "Менеджер конкурсов" },
+  "roles.sports_manager": { kk: "Спорт менеджері", ru: "Менеджер спорта" },
+  "roles.moderator": { kk: "Модератор", ru: "Модератор" },
+  "roles.news_moderator": { kk: "Жаңалықтар модераторы", ru: "Модератор новостей" },
+  "roles.social_admin": { kk: "Әлеуметтік әкімші", ru: "Админ Жылы Жүрекпен" },
+  "roles.employee": { kk: "Қызметкер", ru: "Сотрудник" },
+
   // Common
   "common.status": { kk: "Статус", ru: "Статус" },
   "common.tabKk": { kk: "Қазақша", ru: "Казахский" },

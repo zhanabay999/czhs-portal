@@ -32,8 +32,7 @@ import { signOut } from "next-auth/react";
 const navItems = [
   { key: "home", href: "/" },
   { key: "news", href: "/news" },
-  { key: "services", href: "#services" },
-  { key: "partners", href: "#partners" },
+  { key: "services", href: "/#services" },
   { key: "contacts", href: "#footer" },
 ] as const;
 
@@ -64,49 +63,51 @@ export function Header() {
       <div className="mx-auto max-w-7xl px-4 lg:px-8">
         <div className="flex h-20 items-center justify-between">
           {/* Logo */}
-          <Link href="/" className="group flex items-center gap-2">
+          <Link href="/" className="group flex items-center">
             <img
               src={isKk ? "/czhs-logo-kk.png" : "/czhs-logo-ru.png"}
               alt={isKk ? "Қазақстан Темір Жолы — Магистральдық желі дирекциясы" : "Қазақстан Темір Жолы — Дирекция магистральной сети"}
-              className="h-[80px] w-auto object-contain md:h-[100px] lg:h-[120px]"
+              className="h-[73px] w-auto object-contain"
             />
-            <div className="hidden sm:block">
-              <p className="text-[10px] leading-tight text-muted-foreground">
-                {isKk
-                  ? "«ҚТЖ» ҰК» АҚ филиалы — Магистральдық желі дирекциясы"
-                  : "Филиал АО «НК «ҚТЖ» — Дирекция магистральной сети"}
-              </p>
-              <p className="text-[10px] leading-tight text-muted-foreground">
-                {isKk
-                  ? "Инфрақұрылымның ұлттық операторы"
-                  : "Национальный оператор инфраструктуры"}
-              </p>
-            </div>
           </Link>
 
           {/* Desktop Navigation */}
           <nav className="hidden items-center gap-1 lg:flex">
-            {navItems.map((item) => (
-              <Link
-                key={item.key}
-                href={item.href}
-                className={`rounded-md px-3 py-2 text-sm font-medium transition-colors hover:bg-secondary hover:text-foreground ${
-                  pathname === item.href
-                    ? "text-foreground"
-                    : "text-muted-foreground"
-                }`}
-              >
-                {item.key === "home"
+            {navItems.map((item) => {
+              const label =
+                item.key === "home"
                   ? tc("home")
                   : item.key === "news"
                     ? t("news")
                     : item.key === "services"
                       ? isKk ? "Сервистер" : "Сервисы"
-                      : item.key === "partners"
-                        ? isKk ? "Серіктестер" : "Партнёры"
-                        : isKk ? "Байланыс" : "Контакты"}
-              </Link>
-            ))}
+                      : isKk ? "Байланыс" : "Контакты";
+
+              const cls = `rounded-md px-3 py-2 text-sm font-medium transition-colors hover:bg-secondary hover:text-foreground ${
+                pathname === item.href
+                  ? "text-foreground"
+                  : "text-muted-foreground"
+              }`;
+
+              // Anchor links need native <a> with locale prefix
+              if (item.href.includes("#")) {
+                return (
+                  <a
+                    key={item.key}
+                    href={`/${locale}${item.href}`}
+                    className={cls}
+                  >
+                    {label}
+                  </a>
+                );
+              }
+
+              return (
+                <Link key={item.key} href={item.href} className={cls}>
+                  {label}
+                </Link>
+              );
+            })}
           </nav>
 
           {/* Right side actions */}

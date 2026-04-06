@@ -1,11 +1,9 @@
 import { setRequestLocale } from "next-intl/server";
 import { Link } from "@/i18n/routing";
 import {
-  ArrowLeft,
   BookOpen,
   Users,
   ClipboardList,
-  Award,
   FileText,
   Building2,
   Phone,
@@ -23,6 +21,7 @@ import {
   Star,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { BackButton } from "@/components/ui/back-button";
 import Image from "next/image";
 
 type Props = { params: Promise<{ locale: string }> };
@@ -34,12 +33,7 @@ export default async function SanatoriumMemoPage({ params }: Props) {
 
   return (
     <div className="container mx-auto max-w-4xl px-4 py-8">
-      <Button asChild variant="ghost" className="mb-6">
-        <Link href="/sanatorium">
-          <ArrowLeft className="mr-2 h-4 w-4" />
-          {isKk ? "Артқа" : "Назад"}
-        </Link>
-      </Button>
+      <BackButton label={isKk ? "Артқа" : "Назад"} />
 
       {/* Hero Section */}
       <div className="mb-10 rounded-2xl bg-gradient-to-br from-[#003DA5] to-[#0052CC] p-8 text-white shadow-xl sm:p-10">

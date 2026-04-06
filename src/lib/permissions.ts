@@ -6,6 +6,8 @@ export type UserRole =
   | "contest_manager"
   | "sports_manager"
   | "moderator"
+  | "news_moderator"
+  | "social_admin"
   | "employee";
 
 const ROLE_PERMISSIONS: Record<UserRole, string[]> = {
@@ -18,6 +20,8 @@ const ROLE_PERMISSIONS: Record<UserRole, string[]> = {
     "faq:*",
     "contest:*",
     "sports:*",
+    "partners:*",
+    "hotel:*",
     "audit:read",
     "admin:access",
     "export:*",
@@ -33,6 +37,17 @@ const ROLE_PERMISSIONS: Record<UserRole, string[]> = {
   contest_manager: ["contest:*", "admin:access", "export:*"],
   sports_manager: ["sports:*", "admin:access", "export:*"],
   moderator: ["faq:*", "admin:access"],
+  news_moderator: [
+    "news:*",
+    "upload:*",
+    "admin:access",
+  ],
+  social_admin: [
+    "partners:*",
+    "hotel:*",
+    "upload:*",
+    "admin:access",
+  ],
   employee: ["profile:*", "vote:create"],
 };
 

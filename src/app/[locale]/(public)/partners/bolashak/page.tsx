@@ -1,7 +1,8 @@
 import { setRequestLocale } from "next-intl/server";
 import { Link } from "@/i18n/routing";
-import { ArrowLeft, ExternalLink } from "lucide-react";
+import { ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { BackButton } from "@/components/ui/back-button";
 import { ExpandableSection } from "./expandable-section";
 
 type Props = { params: Promise<{ locale: string }> };
@@ -43,12 +44,7 @@ export default async function BolashakPage({ params }: Props) {
 
   return (
     <div className="container mx-auto max-w-3xl px-4 py-8">
-      <Button asChild variant="ghost" className="mb-6">
-        <Link href="/">
-          <ArrowLeft className="mr-2 h-4 w-4" />
-          {isKk ? "Артқа" : "Назад"}
-        </Link>
-      </Button>
+      <BackButton label={isKk ? "Артқа" : "Назад"} />
 
       <div className="mb-8 flex flex-col items-center text-center">
         <div className="mb-6 flex h-24 w-auto items-center justify-center overflow-hidden">

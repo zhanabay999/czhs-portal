@@ -1,7 +1,8 @@
 import { setRequestLocale } from "next-intl/server";
 import { Link } from "@/i18n/routing";
-import { ArrowLeft, FileText, Download, Eye } from "lucide-react";
+import { FileText, Download, Eye } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { BackButton } from "@/components/ui/back-button";
 
 type Props = { params: Promise<{ locale: string }> };
 
@@ -24,6 +25,12 @@ const forms = [
     titleKk: "Салық салынатын табыстарды түзету туралы өтініш үлгісі",
     size: "20 КБ",
   },
+  {
+    file: "/forms/application-consent.docx",
+    titleRu: "Образец заявления — согласие",
+    titleKk: "Өтініш-келісім үлгісі",
+    size: "18 КБ",
+  },
 ];
 
 export default async function SanatoriumApplicationFormPage({ params }: Props) {
@@ -33,12 +40,7 @@ export default async function SanatoriumApplicationFormPage({ params }: Props) {
 
   return (
     <div className="container mx-auto max-w-3xl px-4 py-8">
-      <Button asChild variant="ghost" className="mb-6">
-        <Link href="/sanatorium">
-          <ArrowLeft className="mr-2 h-4 w-4" />
-          {isKk ? "Артқа" : "Назад"}
-        </Link>
-      </Button>
+      <BackButton label={isKk ? "Артқа" : "Назад"} />
 
       <h1 className="mb-2 text-2xl font-bold text-[#003DA5] sm:text-3xl">
         {isKk ? "Өтініш үлгілері" : "Образцы заявлений"}

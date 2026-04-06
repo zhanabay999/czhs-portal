@@ -1,6 +1,6 @@
 import { db } from "@/db";
-import { newsArticles } from "@/db/schema";
-import { desc } from "drizzle-orm";
+import { newsArticles, newsCategories } from "@/db/schema";
+import { desc, eq } from "drizzle-orm";
 import { NewsListClient } from "./NewsListClient";
 
 export default async function AdminNewsPage() {
@@ -13,12 +13,13 @@ export default async function AdminNewsPage() {
     isPinned: boolean;
     isInternal: boolean;
     viewCount: number;
+    categoryName: string | null;
     publishedAt: Date | null;
     createdAt: Date;
   }> = [];
 
   try {
-    articles = await db
+    const raw = await db
       .select({
         id: newsArticles.id,
         slug: newsArticles.slug,
@@ -28,11 +29,20 @@ export default async function AdminNewsPage() {
         isPinned: newsArticles.isPinned,
         isInternal: newsArticles.isInternal,
         viewCount: newsArticles.viewCount,
+        categoryId: newsArticles.categoryId,
         publishedAt: newsArticles.publishedAt,
         createdAt: newsArticles.createdAt,
       })
       .from(newsArticles)
       .orderBy(desc(newsArticles.createdAt));
+
+    const categories = await db.select().from(newsCategories);
+    const catMap = new Map(categories.map((c) => [c.id, c.nameRu]));
+
+    articles = raw.map((a) => ({
+      ...a,
+      categoryName: a.categoryId ? catMap.get(a.categoryId) || null : null,
+    }));
   } catch {}
 
   return <NewsListClient articles={JSON.parse(JSON.stringify(articles))} />;

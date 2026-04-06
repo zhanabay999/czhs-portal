@@ -16,6 +16,7 @@ import {
   Users,
   Shield,
 } from "lucide-react";
+import { HeroCarousel } from "@/components/hero-carousel";
 import { db } from "@/db";
 import { newsArticles } from "@/db/schema";
 import { desc, eq, and } from "drizzle-orm";
@@ -137,62 +138,9 @@ function HomeContent({
 
   return (
     <div>
-      {/* Hero Section */}
+      {/* Hero Carousel */}
       <section className="relative overflow-hidden">
-        <div className="relative h-[520px] md:h-[580px] lg:h-[620px]">
-          {featured?.coverImageUrl ? (
-            <img
-              alt={isKk ? featured.titleKk : featured.titleRu}
-              className="absolute inset-0 h-full w-full object-cover"
-              src={featured.coverImageUrl}
-            />
-          ) : (
-            <div className="absolute inset-0 bg-gradient-to-br from-[#003DA5] via-[#002D7A] to-[#001a4d]" />
-          )}
-          <div className="absolute inset-0 bg-gradient-to-r from-foreground/90 via-foreground/60 to-foreground/30" />
-          <div className="relative z-10 mx-auto flex h-full max-w-7xl items-center px-4 lg:px-8">
-            <div className="max-w-2xl">
-              {featured?.isPinned && (
-                <span className="mb-4 inline-flex items-center justify-center rounded-md bg-accent px-3 py-1 text-xs font-semibold uppercase tracking-wider text-accent-foreground">
-                  {isKk ? "Маңызды" : "Важное"}
-                </span>
-              )}
-              <h1 className="mb-4 text-balance text-3xl font-bold leading-tight text-primary-foreground md:text-4xl lg:text-5xl">
-                {featured
-                  ? isKk ? featured.titleKk : featured.titleRu
-                  : t("heroTitle")}
-              </h1>
-              <p className="mb-6 max-w-lg text-base leading-relaxed text-primary-foreground/80 md:text-lg">
-                {featured
-                  ? (isKk ? featured.excerptKk : featured.excerptRu) || t("heroSubtitle")
-                  : t("heroSubtitle")}
-              </p>
-              {featured && (
-                <div className="mb-8 flex items-center gap-3 text-sm text-primary-foreground/60">
-                  <Calendar className="h-4 w-4" />
-                  <span>{formatDate(featured.publishedAt)}</span>
-                </div>
-              )}
-              <div className="flex flex-wrap gap-3">
-                {featured ? (
-                  <Link
-                    href={`/news/${featured.slug}`}
-                    className="inline-flex h-10 items-center gap-2 rounded-md bg-accent px-6 text-sm font-semibold text-accent-foreground transition-colors hover:bg-accent/90"
-                  >
-                    {tc("readMore")}
-                    <ArrowRight className="ml-1 h-4 w-4" />
-                  </Link>
-                ) : null}
-                <Link
-                  href="/news"
-                  className="inline-flex h-10 items-center rounded-md border border-primary-foreground/30 px-6 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary-foreground/10"
-                >
-                  {isKk ? "Барлық жаңалықтар" : "Все новости"}
-                </Link>
-              </div>
-            </div>
-          </div>
-        </div>
+        <HeroCarousel />
 
         {/* Stats Bar */}
         <div className="bg-primary">
@@ -466,6 +414,28 @@ function HomeContent({
               ))}
             </div>
           </div>
+        </div>
+      </section>
+
+      {/* Instagram */}
+      <section className="py-10">
+        <div className="container mx-auto flex justify-center px-4">
+          <a
+            href="https://www.instagram.com/czhs_KTZ_OFFICIAL"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-3 rounded-xl border border-border bg-card px-8 py-4 transition-all hover:border-pink-300 hover:shadow-lg"
+          >
+            <svg viewBox="0 0 24 24" className="h-7 w-7 text-pink-500" fill="currentColor">
+              <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z" />
+            </svg>
+            <div>
+              <p className="text-sm font-bold text-foreground">@czhs_KTZ_OFFICIAL</p>
+              <p className="text-xs text-muted-foreground">
+                {isKk ? "Бізді Instagram-да жазылыңыз" : "Подписывайтесь на нас в Instagram"}
+              </p>
+            </div>
+          </a>
         </div>
       </section>
     </div>

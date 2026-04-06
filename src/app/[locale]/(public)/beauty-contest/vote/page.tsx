@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Crown, LogIn, Check, Loader2 } from "lucide-react";
 import { toast } from "sonner";
+import { BackButton } from "@/components/ui/back-button";
 
 export default function VotePage() {
   const t = useTranslations("contest");
@@ -104,6 +105,7 @@ export default function VotePage() {
 
   return (
     <div className="container mx-auto px-4 py-8">
+      <BackButton label={isKk ? "Артқа" : "Назад"} />
       <div className="mb-8 text-center">
         <h1 className="mb-2 text-3xl font-bold text-[#003DA5]">{t("vote")}</h1>
         <div className="mx-auto h-1 w-20 rounded bg-[#C8A951]" />
