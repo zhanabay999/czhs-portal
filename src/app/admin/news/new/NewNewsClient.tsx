@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useState, useTransition, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { createNewsArticle } from "@/actions/news.actions";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -61,6 +61,7 @@ export function NewNewsClient({ categories, allTags = [] }: { categories: Catego
 
   const [isPinned, setIsPinned] = useState(false);
   const [tags, setTags] = useState<string[]>([]);
+  const tagInputRef = useRef<HTMLInputElement>(null);
 
   // Scheduled publishing
   const [useSchedule, setUseSchedule] = useState(false);
@@ -78,6 +79,10 @@ export function NewNewsClient({ categories, allTags = [] }: { categories: Catego
   };
 
   const handleSubmit = (status: "draft" | "published") => {
+    // Flush any pending tag text in the input field
+    const pendingTag = tagInputRef.current?.value?.trim().replace(/^#/, "").toLowerCase();
+    const finalTags = pendingTag && !tags.includes(pendingTag) ? [...tags, pendingTag] : tags;
+
     if (!titleKk && !titleRu) {
       toast.error(locale === "kk" ? "Тақырыпты толтырыңыз" : "Заполните заголовок");
       return;
@@ -107,7 +112,7 @@ export function NewNewsClient({ categories, allTags = [] }: { categories: Catego
           status,
 
           isPinned,
-          tags,
+          tags: finalTags,
           scheduledAt,
         });
         toast.success(
@@ -374,7 +379,7 @@ export function NewNewsClient({ categories, allTags = [] }: { categories: Catego
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <TagsInput tags={tags} onChange={setTags} locale={locale} suggestions={allTags} />
+              <TagsInput ref={tagInputRef} tags={tags} onChange={setTags} locale={locale} suggestions={allTags} />
             </CardContent>
           </Card>
 

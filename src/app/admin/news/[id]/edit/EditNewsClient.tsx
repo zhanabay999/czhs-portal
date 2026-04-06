@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useState, useTransition, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { updateNewsArticle, deleteNewsArticle } from "@/actions/news.actions";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -98,6 +98,7 @@ export function EditNewsClient({
 
   const [isPinned, setIsPinned] = useState(article.isPinned);
   const [tags, setTags] = useState<string[]>(initialTags);
+  const tagInputRef = useRef<HTMLInputElement>(null);
 
   const [showPreview, setShowPreview] = useState(false);
   const [useSchedule, setUseSchedule] = useState(false);
@@ -112,6 +113,9 @@ export function EditNewsClient({
   };
 
   const handleSubmit = (status: "draft" | "published" | "archived") => {
+    const pendingTag = tagInputRef.current?.value?.trim().replace(/^#/, "").toLowerCase();
+    const finalTags = pendingTag && !tags.includes(pendingTag) ? [...tags, pendingTag] : tags;
+
     if (!titleKk || !titleRu) {
       toast.error(locale === "kk" ? "Тақырыпты толтырыңыз" : "Заполните заголовок");
       return;
@@ -141,7 +145,7 @@ export function EditNewsClient({
           status,
 
           isPinned,
-          tags,
+          tags: finalTags,
           scheduledAt,
         });
         toast.success(locale === "kk" ? "Сақталды" : "Сохранено");
@@ -410,7 +414,7 @@ export function EditNewsClient({
               <CardTitle className="text-base">{locale === "kk" ? "Хэштегтер" : "Хэштеги"}</CardTitle>
             </CardHeader>
             <CardContent>
-              <TagsInput tags={tags} onChange={setTags} locale={locale} suggestions={allTags} />
+              <TagsInput ref={tagInputRef} tags={tags} onChange={setTags} locale={locale} suggestions={allTags} />
             </CardContent>
           </Card>
 
