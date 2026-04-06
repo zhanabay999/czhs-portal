@@ -184,7 +184,7 @@ function NewsContent({
                   <div className="relative aspect-[16/10] overflow-hidden bg-gray-100">
                     {(isKk ? article.coverImageUrlKk : article.coverImageUrlRu) || article.coverImageUrl ? (
                       <img
-                        src={(isKk ? article.coverImageUrlKk : article.coverImageUrlRu) || article.coverImageUrl}
+                        src={((isKk ? article.coverImageUrlKk : article.coverImageUrlRu) || article.coverImageUrl)!}
                         alt={isKk ? article.titleKk : article.titleRu}
                         className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
                       />

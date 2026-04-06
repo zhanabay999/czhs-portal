@@ -221,7 +221,7 @@ function HomeContent({
                         <img
                           alt={isKk ? featured.titleKk : featured.titleRu}
                           className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-                          src={(isKk ? featured.coverImageUrlKk : featured.coverImageUrlRu) || featured.coverImageUrl}
+                          src={((isKk ? featured.coverImageUrlKk : featured.coverImageUrlRu) || featured.coverImageUrl)!}
                         />
                       ) : (
                         <div className="flex h-full items-center justify-center bg-gradient-to-br from-primary to-[#0066CC]">
@@ -259,7 +259,7 @@ function HomeContent({
                           <img
                             alt={isKk ? article.titleKk : article.titleRu}
                             className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-                            src={(isKk ? article.coverImageUrlKk : article.coverImageUrlRu) || article.coverImageUrl}
+                            src={((isKk ? article.coverImageUrlKk : article.coverImageUrlRu) || article.coverImageUrl)!}
                           />
                         ) : (
                           <div className="flex h-full items-center justify-center bg-gradient-to-br from-primary/80 to-[#0066CC]/80">
