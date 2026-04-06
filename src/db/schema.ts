@@ -9,6 +9,7 @@ import {
   uniqueIndex,
   index,
   primaryKey,
+  jsonb,
 } from "drizzle-orm/pg-core";
 
 // ============================================================
@@ -130,6 +131,8 @@ export const newsArticles = pgTable(
     contentKk: text("content_kk").notNull(),
     contentRu: text("content_ru").notNull(),
     coverImageUrl: text("cover_image_url"),
+    coverImageUrlKk: text("cover_image_url_kk"),
+    coverImageUrlRu: text("cover_image_url_ru"),
     status: contentStatusEnum("status").default("draft").notNull(),
     isInternal: boolean("is_internal").default(false).notNull(),
     isPinned: boolean("is_pinned").default(false).notNull(),
@@ -470,6 +473,85 @@ export const sportsGalleryImages = pgTable("sports_gallery_images", {
     .notNull()
     .references(() => sportsEvents.id, { onDelete: "cascade" }),
 });
+
+// ============================================================
+// PATRONAGE (Жылы жүрекпен)
+// ============================================================
+
+export const patronageBranches = pgTable("patronage_branches", {
+  id: text("id")
+    .primaryKey()
+    .$defaultFn(() => crypto.randomUUID()),
+  code: varchar("code", { length: 50 }).notNull().unique(),
+  nameKk: varchar("name_kk", { length: 255 }).notNull(),
+  nameRu: varchar("name_ru", { length: 255 }).notNull(),
+  childrenCount: integer("children_count").default(0).notNull(),
+  curators: jsonb("curators").$type<Array<{ name: string; position: string }>>().default([]).notNull(),
+  subBranchNameKk: varchar("sub_branch_name_kk", { length: 255 }),
+  subBranchNameRu: varchar("sub_branch_name_ru", { length: 255 }),
+  subBranchChildrenCount: integer("sub_branch_children_count"),
+  subBranchCurators: jsonb("sub_branch_curators").$type<Array<{ name: string; position: string }>>(),
+  sortOrder: integer("sort_order").default(0).notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+export type PatronageBranch = typeof patronageBranches.$inferSelect;
+
+// ============================================================
+// SPORTS APPLICATIONS
+// ============================================================
+
+export const sportsApplications = pgTable("sports_applications", {
+  id: text("id")
+    .primaryKey()
+    .$defaultFn(() => crypto.randomUUID()),
+  lastName: varchar("last_name", { length: 255 }).notNull(),
+  firstName: varchar("first_name", { length: 255 }).notNull(),
+  patronymic: varchar("patronymic", { length: 255 }),
+  employeeId: varchar("employee_id", { length: 50 }),
+  branch: varchar("branch", { length: 255 }).notNull(),
+  sportType: varchar("sport_type", { length: 100 }).notNull(),
+  phone: varchar("phone", { length: 50 }).notNull(),
+  status: varchar("status", { length: 20 }).default("new").notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+// ============================================================
+// HERO SLIDES (КАРУСЕЛЬ)
+// ============================================================
+
+export const heroSlides = pgTable("hero_slides", {
+  id: text("id")
+    .primaryKey()
+    .$defaultFn(() => crypto.randomUUID()),
+  imageUrl: text("image_url").notNull(),
+  sortOrder: integer("sort_order").default(0).notNull(),
+  isActive: boolean("is_active").default(true).notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+// ============================================================
+// LEADERSHIP (РУКОВОДСТВО)
+// ============================================================
+
+export const leaders = pgTable("leaders", {
+  id: text("id")
+    .primaryKey()
+    .$defaultFn(() => crypto.randomUUID()),
+  nameKk: varchar("name_kk", { length: 255 }).notNull(),
+  nameRu: varchar("name_ru", { length: 255 }).notNull(),
+  positionKk: text("position_kk").notNull(),
+  positionRu: text("position_ru").notNull(),
+  photoUrl: text("photo_url"),
+  photoPosition: text("photo_position").default("50% 20%"),
+  level: integer("level").notNull(),
+  sortOrder: integer("sort_order").default(0).notNull(),
+  parentId: text("parent_id"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+export type Leader = typeof leaders.$inferSelect;
 
 // ============================================================
 // SYSTEM
