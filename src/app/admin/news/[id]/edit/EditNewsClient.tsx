@@ -294,11 +294,22 @@ export function EditNewsClient({
                   <p className="text-xs font-bold uppercase tracking-wider text-gray-500">РУС</p>
 
                   <div>
-                    <Label className="mb-1.5 block text-xs text-muted-foreground">
-                      {locale === "kk" ? "Басты сурет" : "Обложка"}
-                    </Label>
                     {!ruImageOverridden ? (
                       <div className="space-y-2">
+                        <div className="flex items-center justify-between">
+                          <Label className="text-xs text-muted-foreground">
+                            {locale === "kk" ? "Басты сурет" : "Обложка"}
+                          </Label>
+                          <Button
+                            type="button"
+                            size="sm"
+                            variant="outline"
+                            className="h-6 px-2 text-xs"
+                            onClick={() => setRuImageOverridden(true)}
+                          >
+                            {locale === "kk" ? "Басқа сурет қою" : "Поставить другое фото"}
+                          </Button>
+                        </div>
                         {coverImageUrlRu ? (
                           <div className="relative overflow-hidden rounded-lg border">
                             <img src={coverImageUrlRu} alt="" className="h-40 w-full object-cover opacity-80" />
@@ -313,15 +324,6 @@ export function EditNewsClient({
                             {locale === "kk" ? "ҚАЗ суреті автоматты қосылады" : "Фото добавится автоматически из KK"}
                           </div>
                         )}
-                        <Button
-                          type="button"
-                          size="sm"
-                          variant="outline"
-                          className="w-full text-xs"
-                          onClick={() => setRuImageOverridden(true)}
-                        >
-                          {locale === "kk" ? "Басқа сурет қою" : "Поставить другое фото"}
-                        </Button>
                       </div>
                     ) : (
                       <div className="space-y-2">
