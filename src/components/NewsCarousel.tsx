@@ -12,6 +12,8 @@ type Article = {
   excerptKk: string | null;
   excerptRu: string | null;
   coverImageUrl: string | null;
+  coverImageUrlKk: string | null;
+  coverImageUrlRu: string | null;
   publishedAt: Date | null;
   isPinned: boolean;
 };
@@ -44,9 +46,9 @@ export function NewsCarousel({
           <Link key={article.id} href={`/${locale}/news/${article.slug}`} className="group">
             <article className="h-full overflow-hidden rounded-lg border border-gray-200 bg-white transition-all hover:shadow-md">
               <div className="relative aspect-[16/10] overflow-hidden bg-gray-100">
-                {article.coverImageUrl ? (
+                {(isKk ? article.coverImageUrlKk : article.coverImageUrlRu) || article.coverImageUrl ? (
                   <img
-                    src={article.coverImageUrl}
+                    src={(isKk ? article.coverImageUrlKk : article.coverImageUrlRu) || article.coverImageUrl}
                     alt={isKk ? article.titleKk : article.titleRu}
                     className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
                   />

@@ -31,6 +31,8 @@ export default async function NewsPage({ params, searchParams }: Props) {
     excerptKk: string | null;
     excerptRu: string | null;
     coverImageUrl: string | null;
+    coverImageUrlKk: string | null;
+    coverImageUrlRu: string | null;
     publishedAt: Date | null;
     isPinned: boolean;
     viewCount: number;
@@ -72,6 +74,8 @@ export default async function NewsPage({ params, searchParams }: Props) {
         excerptKk: newsArticles.excerptKk,
         excerptRu: newsArticles.excerptRu,
         coverImageUrl: newsArticles.coverImageUrl,
+        coverImageUrlKk: newsArticles.coverImageUrlKk,
+        coverImageUrlRu: newsArticles.coverImageUrlRu,
         publishedAt: newsArticles.publishedAt,
         isPinned: newsArticles.isPinned,
         viewCount: newsArticles.viewCount,
@@ -117,6 +121,8 @@ function NewsContent({
     excerptKk: string | null;
     excerptRu: string | null;
     coverImageUrl: string | null;
+    coverImageUrlKk: string | null;
+    coverImageUrlRu: string | null;
     publishedAt: Date | null;
     isPinned: boolean;
     viewCount: number;
@@ -176,9 +182,9 @@ function NewsContent({
               <Link key={article.id} href={`/news/${article.slug}`} className="group">
                 <article className="h-full overflow-hidden rounded-lg border border-gray-200 transition-all hover:shadow-md">
                   <div className="relative aspect-[16/10] overflow-hidden bg-gray-100">
-                    {article.coverImageUrl ? (
+                    {(isKk ? article.coverImageUrlKk : article.coverImageUrlRu) || article.coverImageUrl ? (
                       <img
-                        src={article.coverImageUrl}
+                        src={(isKk ? article.coverImageUrlKk : article.coverImageUrlRu) || article.coverImageUrl}
                         alt={isKk ? article.titleKk : article.titleRu}
                         className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
                       />

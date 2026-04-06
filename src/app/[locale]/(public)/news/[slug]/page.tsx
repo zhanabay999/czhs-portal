@@ -87,10 +87,10 @@ function ArticleContent({
       </Button>
 
       {/* Cover image */}
-      {article.coverImageUrl && (
+      {((isKk ? article.coverImageUrlKk : article.coverImageUrlRu) || article.coverImageUrl) && (
         <div className="mb-8 overflow-hidden rounded-xl">
           <img
-            src={article.coverImageUrl}
+            src={((isKk ? article.coverImageUrlKk : article.coverImageUrlRu) || article.coverImageUrl)!}
             alt={isKk ? article.titleKk : article.titleRu}
             className="h-[250px] w-full object-cover md:h-[350px] lg:h-[400px]"
           />

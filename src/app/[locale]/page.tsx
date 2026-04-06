@@ -3,12 +3,14 @@ import { setRequestLocale } from "next-intl/server";
 import { Link } from "@/i18n/routing";
 import {
   Newspaper,
-  Heart,
+  Stethoscope,
   Briefcase,
   Sun,
-  RefreshCcw,
-  Flower2,
-  Trophy,
+  HelpCircle,
+  Crown,
+  Medal,
+  HeartHandshake,
+  UserCog,
   ArrowRight,
   Calendar,
   Bell,
@@ -18,8 +20,8 @@ import {
 } from "lucide-react";
 import { HeroCarousel } from "@/components/hero-carousel";
 import { db } from "@/db";
-import { newsArticles } from "@/db/schema";
-import { desc, eq, and } from "drizzle-orm";
+import { newsArticles, heroSlides } from "@/db/schema";
+import { desc, eq, and, asc } from "drizzle-orm";
 
 type Props = {
   params: Promise<{ locale: string }>;
@@ -37,6 +39,8 @@ export default async function HomePage({ params }: Props) {
     excerptKk: string | null;
     excerptRu: string | null;
     coverImageUrl: string | null;
+    coverImageUrlKk: string | null;
+    coverImageUrlRu: string | null;
     publishedAt: Date | null;
     isPinned: boolean;
   }> = [];
@@ -51,6 +55,8 @@ export default async function HomePage({ params }: Props) {
         excerptKk: newsArticles.excerptKk,
         excerptRu: newsArticles.excerptRu,
         coverImageUrl: newsArticles.coverImageUrl,
+        coverImageUrlKk: newsArticles.coverImageUrlKk,
+        coverImageUrlRu: newsArticles.coverImageUrlRu,
         publishedAt: newsArticles.publishedAt,
         isPinned: newsArticles.isPinned,
       })
@@ -65,13 +71,21 @@ export default async function HomePage({ params }: Props) {
       .limit(10);
   } catch {}
 
-  return <HomeContent locale={locale} latestNews={latestNews} />;
+  let slideUrls: string[] = [];
+  try {
+    const slides = await db.select({ imageUrl: heroSlides.imageUrl }).from(heroSlides).where(eq(heroSlides.isActive, true)).orderBy(asc(heroSlides.sortOrder));
+    slideUrls = slides.map(s => s.imageUrl);
+  } catch {}
+
+  return <HomeContent locale={locale} latestNews={latestNews} slideUrls={slideUrls} />;
 }
 
 function HomeContent({
   locale,
   latestNews,
+  slideUrls,
 }: {
+  slideUrls: string[];
   locale: string;
   latestNews: Array<{
     id: string;
@@ -81,6 +95,8 @@ function HomeContent({
     excerptKk: string | null;
     excerptRu: string | null;
     coverImageUrl: string | null;
+    coverImageUrlKk: string | null;
+    coverImageUrlRu: string | null;
     publishedAt: Date | null;
     isPinned: boolean;
   }>;
@@ -103,13 +119,14 @@ function HomeContent({
   };
 
   const services = [
-    { key: "sanatorium", href: "/sanatorium", icon: Heart, iconBg: "bg-red-50", iconColor: "text-red-600" },
+    { key: "sanatorium", href: "/sanatorium", icon: Stethoscope, iconBg: "bg-teal-50", iconColor: "text-teal-600" },
     { key: "vacancies", href: "/vacancies", icon: Briefcase, iconBg: "bg-blue-50", iconColor: "text-blue-600" },
     { key: "summerCamp", href: "/summer-camp", icon: Sun, iconBg: "bg-amber-50", iconColor: "text-amber-600" },
-    { key: "faq", href: "/reorganization-faq", icon: RefreshCcw, iconBg: "bg-emerald-50", iconColor: "text-emerald-600" },
-    { key: "beautyContest", href: "/beauty-contest", icon: Flower2, iconBg: "bg-pink-50", iconColor: "text-pink-600" },
-    { key: "sports", href: "/sports", icon: Trophy, iconBg: "bg-indigo-50", iconColor: "text-indigo-600" },
-    { key: "zhylyZhurekpen", href: "/zhyly-zhurekpen", icon: Heart, iconBg: "bg-orange-50", iconColor: "text-orange-600" },
+    { key: "faq", href: "/reorganization-faq", icon: HelpCircle, iconBg: "bg-emerald-50", iconColor: "text-emerald-600" },
+    { key: "beautyContest", href: "/beauty-contest", icon: Crown, iconBg: "bg-pink-50", iconColor: "text-pink-600" },
+    { key: "sports", href: "/sports", icon: Medal, iconBg: "bg-indigo-50", iconColor: "text-indigo-600" },
+    { key: "zhylyZhurekpen", href: "/zhyly-zhurekpen", icon: HeartHandshake, iconBg: "bg-orange-50", iconColor: "text-orange-600" },
+    { key: "leadership", href: "/leadership", icon: UserCog, iconBg: "bg-violet-50", iconColor: "text-violet-600" },
   ];
 
   const serviceDescriptions: Record<string, string> = {
@@ -134,13 +151,16 @@ function HomeContent({
     zhylyZhurekpen: isKk
       ? "«Жылы жүрекпен» әлеуметтік жобасы"
       : "Социальный проект «Жылы Жүрекпен»",
+    leadership: isKk
+      ? "Компания басшылығының құрылымы"
+      : "Структура руководства компании",
   };
 
   return (
     <div>
       {/* Hero Carousel */}
       <section className="relative overflow-hidden">
-        <HeroCarousel />
+        <HeroCarousel slides={slideUrls} />
 
         {/* Stats Bar */}
         <div className="bg-primary">
@@ -197,11 +217,11 @@ function HomeContent({
                 >
                   <article>
                     <div className="relative mb-4 h-72 overflow-hidden rounded-xl md:h-80">
-                      {featured.coverImageUrl ? (
+                      {(isKk ? featured.coverImageUrlKk : featured.coverImageUrlRu) || featured.coverImageUrl ? (
                         <img
                           alt={isKk ? featured.titleKk : featured.titleRu}
                           className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-                          src={featured.coverImageUrl}
+                          src={(isKk ? featured.coverImageUrlKk : featured.coverImageUrlRu) || featured.coverImageUrl}
                         />
                       ) : (
                         <div className="flex h-full items-center justify-center bg-gradient-to-br from-primary to-[#0066CC]">
@@ -235,11 +255,11 @@ function HomeContent({
                   >
                     <article>
                       <div className="relative mb-3 h-48 overflow-hidden rounded-xl">
-                        {article.coverImageUrl ? (
+                        {(isKk ? article.coverImageUrlKk : article.coverImageUrlRu) || article.coverImageUrl ? (
                           <img
                             alt={isKk ? article.titleKk : article.titleRu}
                             className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-                            src={article.coverImageUrl}
+                            src={(isKk ? article.coverImageUrlKk : article.coverImageUrlRu) || article.coverImageUrl}
                           />
                         ) : (
                           <div className="flex h-full items-center justify-center bg-gradient-to-br from-primary/80 to-[#0066CC]/80">
@@ -364,58 +384,7 @@ function HomeContent({
         </div>
       </section>
 
-      {/* Employee Portal CTA */}
-      <section className="bg-primary py-16 lg:py-20">
-        <div className="mx-auto max-w-7xl px-4 lg:px-8">
-          <div className="grid items-center gap-10 lg:grid-cols-2">
-            <div>
-              <h2 className="mb-4 text-balance text-2xl font-bold text-primary-foreground md:text-3xl lg:text-4xl">
-                {isKk ? "Қызметкер порталы" : "Портал сотрудника"}
-              </h2>
-              <p className="mb-8 max-w-lg text-base leading-relaxed text-primary-foreground/75 md:text-lg">
-                {isKk
-                  ? "Ішкі жаңалықтар, конкурстар, құжаттар және Магистральдық желі дирекциясының әр қызметкері үшін көбірек мүмкіндіктер."
-                  : "Внутренние новости, конкурсы, документы и больше возможностей для каждого сотрудника Дирекции магистральной сети."}
-              </p>
-              <div className="flex flex-wrap gap-3">
-                <Link
-                  href="/login"
-                  className="inline-flex h-10 items-center gap-2 rounded-md bg-accent px-6 text-sm font-semibold text-accent-foreground transition-colors hover:bg-accent/90"
-                >
-                  {isKk ? "Порталға кіру" : "Войти в портал"}
-                  <ArrowRight className="ml-1 h-4 w-4" />
-                </Link>
-                <Link
-                  href="/register"
-                  className="inline-flex h-10 items-center rounded-md border border-primary-foreground/30 px-6 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary-foreground/10"
-                >
-                  {isKk ? "Көбірек білу" : "Узнать больше"}
-                </Link>
-              </div>
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              {[
-                { icon: Bell, label: isKk ? "Хабарламалар" : "Уведомления" },
-                { icon: FileText, label: isKk ? "Құжаттар" : "Документы" },
-                { icon: Users, label: isKk ? "Конкурстар" : "Конкурсы" },
-                { icon: Shield, label: isKk ? "Қауіпсіздік" : "Безопасность" },
-              ].map((item) => (
-                <div
-                  key={item.label}
-                  className="flex flex-col items-center gap-3 rounded-xl border border-primary-foreground/10 bg-primary-foreground/10 p-6 backdrop-blur-sm"
-                >
-                  <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-primary-foreground/15">
-                    <item.icon className="h-6 w-6 text-primary-foreground" />
-                  </div>
-                  <span className="text-sm font-medium text-primary-foreground">
-                    {item.label}
-                  </span>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
+      {/* Employee Portal CTA — temporarily hidden */}
 
       {/* Instagram */}
       <section className="py-10">
