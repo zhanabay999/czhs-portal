@@ -1,9 +1,9 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import { Link, usePathname } from "@/i18n/routing";
+import { Link, usePathname, useRouter } from "@/i18n/routing";
 import { useLocale } from "next-intl";
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import {
   Menu,
   Globe,
@@ -33,6 +33,7 @@ const navItems = [
   { key: "home", href: "/" },
   { key: "news", href: "/news" },
   { key: "services", href: "/#services" },
+  { key: "leadership", href: "/leadership" },
   { key: "contacts", href: "#footer" },
 ] as const;
 
@@ -44,6 +45,7 @@ const mobileNavItems = [
   { key: "faq", href: "/reorganization-faq" },
   { key: "beautyContest", href: "/beauty-contest" },
   { key: "sports", href: "/sports" },
+  { key: "leadership", href: "/leadership" },
   { key: "zhylyZhurekpen", href: "/zhyly-zhurekpen" },
 ] as const;
 
@@ -53,8 +55,25 @@ export function Header() {
   const locale = useLocale();
   const pathname = usePathname();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const searchInputRef = useRef<HTMLInputElement>(null);
   const { data: session } = useSession();
+  const router = useRouter();
   const isKk = locale === "kk";
+
+  useEffect(() => {
+    if (searchOpen) searchInputRef.current?.focus();
+  }, [searchOpen]);
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      router.push(`/news?search=${encodeURIComponent(searchQuery.trim())}`);
+      setSearchOpen(false);
+      setSearchQuery("");
+    }
+  };
 
   const otherLocale = locale === "kk" ? "ru" : "kk";
 
@@ -81,7 +100,9 @@ export function Header() {
                     ? t("news")
                     : item.key === "services"
                       ? isKk ? "Сервистер" : "Сервисы"
-                      : isKk ? "Байланыс" : "Контакты";
+                      : item.key === "leadership"
+                        ? t("leadership")
+                        : isKk ? "Байланыс" : "Контакты";
 
               const cls = `rounded-md px-3 py-2 text-sm font-medium transition-colors hover:bg-secondary hover:text-foreground ${
                 pathname === item.href
@@ -113,14 +134,36 @@ export function Header() {
           {/* Right side actions */}
           <div className="flex items-center gap-2">
             {/* Search */}
-            <Button
-              variant="ghost"
-              size="icon"
-              className="hidden text-muted-foreground hover:text-foreground md:flex"
-            >
-              <Search className="h-4 w-4" />
-              <span className="sr-only">{tc("search")}</span>
-            </Button>
+            <div className="hidden md:flex items-center">
+              {searchOpen ? (
+                <form onSubmit={handleSearch} className="flex items-center gap-1">
+                  <input
+                    ref={searchInputRef}
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    onKeyDown={(e) => e.key === "Escape" && setSearchOpen(false)}
+                    placeholder={isKk ? "Іздеу..." : "Поиск..."}
+                    className="w-44 rounded-md border border-border bg-background px-3 py-1.5 text-sm outline-none focus:border-primary"
+                  />
+                  <Button type="submit" variant="ghost" size="icon" className="text-muted-foreground hover:text-foreground">
+                    <Search className="h-4 w-4" />
+                  </Button>
+                  <Button type="button" variant="ghost" size="icon" className="text-muted-foreground hover:text-foreground" onClick={() => { setSearchOpen(false); setSearchQuery(""); }}>
+                    <span className="text-xs font-medium">✕</span>
+                  </Button>
+                </form>
+              ) : (
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="text-muted-foreground hover:text-foreground"
+                  onClick={() => setSearchOpen(true)}
+                >
+                  <Search className="h-4 w-4" />
+                  <span className="sr-only">{tc("search")}</span>
+                </Button>
+              )}
+            </div>
 
             {/* Language Switcher */}
             <Link
@@ -149,19 +192,10 @@ export function Header() {
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
-                  <DropdownMenuItem asChild>
-                    <Link href="/portal">{tc("portal")}</Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem asChild>
-                    <Link href="/profile">{tc("profile")}</Link>
-                  </DropdownMenuItem>
                   {session.user.role !== "employee" && (
-                    <>
-                      <DropdownMenuSeparator />
-                      <DropdownMenuItem asChild>
-                        <a href="/admin">{tc("admin")}</a>
-                      </DropdownMenuItem>
-                    </>
+                    <DropdownMenuItem asChild>
+                      <a href="/admin">{tc("admin")}</a>
+                    </DropdownMenuItem>
                   )}
                   <DropdownMenuSeparator />
                   <DropdownMenuItem onClick={() => signOut()}>
@@ -169,15 +203,7 @@ export function Header() {
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
-            ) : (
-              <Button
-                asChild
-                size="sm"
-                className="hidden gap-1.5 md:inline-flex"
-              >
-                <Link href="/login">{tc("login")}</Link>
-              </Button>
-            )}
+            ) : null}
 
             {/* Mobile Menu */}
             <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
@@ -221,7 +247,7 @@ export function Header() {
                     <Globe className="h-4 w-4" />
                     {locale === "kk" ? "Русский" : "Қазақша"}
                   </Link>
-                  {session ? (
+                  {session && (
                     <Link
                       href="/portal"
                       onClick={() => setMobileOpen(false)}
@@ -229,15 +255,6 @@ export function Header() {
                     >
                       <User className="h-4 w-4" />
                       {tc("portal")}
-                    </Link>
-                  ) : (
-                    <Link
-                      href="/login"
-                      onClick={() => setMobileOpen(false)}
-                      className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-primary"
-                    >
-                      <LogIn className="h-4 w-4" />
-                      {tc("login")}
                     </Link>
                   )}
                 </div>
