@@ -170,6 +170,7 @@ export function LeadershipClient({ leaders }: { leaders: Leader[] }) {
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [form, setForm] = useState<FormData>(emptyForm);
+  const formRef = useRef<HTMLDivElement>(null);
 
   const level2Leaders = leaders.filter((l) => l.level === 2);
 
@@ -185,10 +186,17 @@ export function LeadershipClient({ leaders }: { leaders: Leader[] }) {
     3: "bg-gray-100 text-gray-800",
   };
 
+  function scrollToForm() {
+    setTimeout(() => {
+      formRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }, 50);
+  }
+
   function openAdd() {
     setForm(emptyForm);
     setEditingId(null);
     setShowForm(true);
+    scrollToForm();
   }
 
   function openEdit(leader: Leader) {
@@ -205,6 +213,7 @@ export function LeadershipClient({ leaders }: { leaders: Leader[] }) {
     });
     setEditingId(leader.id);
     setShowForm(true);
+    scrollToForm();
   }
 
   async function handleSave() {
@@ -277,7 +286,7 @@ export function LeadershipClient({ leaders }: { leaders: Leader[] }) {
 
       {/* Form Modal */}
       {showForm && (
-        <Card className="mb-6 p-6">
+        <div ref={formRef}><Card className="mb-6 p-6">
           <div className="mb-4 flex items-center justify-between">
             <h2 className="text-lg font-semibold">
               {editingId ? t("leadership.edit") : t("leadership.add")}
@@ -373,7 +382,7 @@ export function LeadershipClient({ leaders }: { leaders: Leader[] }) {
               {locale === "kk" ? "Бас тарту" : "Отмена"}
             </Button>
           </div>
-        </Card>
+        </Card></div>
       )}
 
       {/* Уровень 1 — Директор */}
