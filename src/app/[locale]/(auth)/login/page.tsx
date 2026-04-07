@@ -109,15 +109,6 @@ export default function LoginPage() {
               {tc("login")}
             </Button>
 
-            <p className="text-center text-sm text-muted-foreground">
-              {t("noAccount")}{" "}
-              <Link
-                href="/register"
-                className="font-medium text-[#003DA5] hover:underline"
-              >
-                {t("registerLink")}
-              </Link>
-            </p>
           </form>
         </CardContent>
       </Card>
