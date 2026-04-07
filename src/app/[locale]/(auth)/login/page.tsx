@@ -3,7 +3,7 @@
 import { useTranslations } from "next-intl";
 import { useLocale } from "next-intl";
 import { useState } from "react";
-import { signIn } from "next-auth/react";
+import { signIn, getSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -37,7 +37,13 @@ export default function LoginPage() {
       if (result?.error) {
         setError(t("invalidCredentials"));
       } else {
-        router.push(`/${locale}`);
+        const session = await getSession();
+        const role = session?.user?.role;
+        if (role && role !== "employee") {
+          router.push("/admin");
+        } else {
+          router.push(`/${locale}`);
+        }
         router.refresh();
       }
     } catch {
