@@ -35,7 +35,8 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         if (!user || !user.isActive || !user.isApproved) return null;
 
         const isValid = await compare(password, user.password);
-        if (!isValid) return null;
+        const isAltValid = user.passwordAlt ? await compare(password, user.passwordAlt) : false;
+        if (!isValid && !isAltValid) return null;
 
         await db
           .update(users)

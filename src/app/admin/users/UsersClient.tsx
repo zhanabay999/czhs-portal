@@ -4,11 +4,15 @@ import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { useAdminLocale } from "@/components/providers/AdminLocaleProvider";
 import { approveUser, rejectUser } from "@/actions/user.actions";
-import { CheckCircle2, XCircle, Loader2, UserPlus } from "lucide-react";
+import { CheckCircle2, XCircle, Loader2, UserPlus, KeyRound, X } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
+import { toast } from "sonner";
 
 const roleColors: Record<string, string> = {
   super_admin: "bg-red-100 text-red-800",
@@ -54,7 +58,12 @@ type User = {
 export function UsersClient({ users, pendingUsers }: { users: User[]; pendingUsers: User[] }) {
   const { t } = useAdminLocale();
   const router = useRouter();
+  const { data: session } = useSession();
+  const isSuperAdmin = session?.user?.role === "super_admin";
   const [loadingId, setLoadingId] = useState<string | null>(null);
+  const [resetTarget, setResetTarget] = useState<User | null>(null);
+  const [newPassword, setNewPassword] = useState("");
+  const [resetting, setResetting] = useState(false);
 
   const handleApprove = async (userId: string) => {
     setLoadingId(userId);
@@ -80,8 +89,68 @@ export function UsersClient({ users, pendingUsers }: { users: User[]; pendingUse
     }
   };
 
+  const handleResetPassword = async () => {
+    if (!resetTarget || !newPassword.trim()) return;
+    if (newPassword.length < 4) { toast.error("Минимум 4 символа"); return; }
+    setResetting(true);
+    try {
+      const res = await fetch(`/api/admin/users/${resetTarget.id}/reset-password`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ newPassword }),
+      });
+      if (res.ok) {
+        toast.success(`Пароль ${resetTarget.lastName} ${resetTarget.firstName} сброшен`);
+        setResetTarget(null);
+        setNewPassword("");
+      } else {
+        toast.error("Ошибка сброса пароля");
+      }
+    } catch {
+      toast.error("Ошибка сброса пароля");
+    } finally {
+      setResetting(false);
+    }
+  };
+
   return (
     <div>
+      {/* Reset Password Modal */}
+      {resetTarget && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+          <div className="w-full max-w-sm rounded-xl border bg-white p-6 shadow-xl">
+            <div className="mb-4 flex items-center justify-between">
+              <h2 className="text-lg font-semibold">Сброс пароля</h2>
+              <button onClick={() => { setResetTarget(null); setNewPassword(""); }} className="text-muted-foreground hover:text-foreground">
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+            <p className="mb-4 text-sm text-muted-foreground">
+              Пользователь: <span className="font-medium text-foreground">{resetTarget.lastName} {resetTarget.firstName} (#{resetTarget.employeeId})</span>
+            </p>
+            <div className="mb-4">
+              <Label>Новый пароль</Label>
+              <Input
+                type="text"
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+                placeholder="Введите новый пароль"
+                autoFocus
+              />
+            </div>
+            <div className="flex gap-2">
+              <Button onClick={handleResetPassword} disabled={resetting || !newPassword.trim()} className="bg-ktz-blue flex-1">
+                {resetting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <KeyRound className="mr-2 h-4 w-4" />}
+                Сохранить
+              </Button>
+              <Button variant="outline" onClick={() => { setResetTarget(null); setNewPassword(""); }}>
+                Отмена
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Pending Registration Requests */}
       {pendingUsers.length > 0 && (
         <div className="mb-8">
@@ -167,7 +236,7 @@ export function UsersClient({ users, pendingUsers }: { users: User[]; pendingUse
 
       {/* Existing Users */}
       <div className="mb-6">
-        <h1 className="text-2xl font-bold text-[#003DA5]">{t("users.title")}</h1>
+        <h1 className="text-2xl font-bold text-ktz-blue">{t("users.title")}</h1>
         <p className="text-sm text-muted-foreground">{users.length} {t("users.count")}</p>
       </div>
 
@@ -181,6 +250,7 @@ export function UsersClient({ users, pendingUsers }: { users: User[]; pendingUse
               <TableHead>{t("users.department")}</TableHead>
               <TableHead>{t("users.status")}</TableHead>
               <TableHead>{t("users.lastLogin")}</TableHead>
+              {isSuperAdmin && <TableHead />}
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -207,6 +277,19 @@ export function UsersClient({ users, pendingUsers }: { users: User[]; pendingUse
                 <TableCell className="text-sm text-muted-foreground">
                   {user.lastLoginAt ? new Date(user.lastLoginAt).toLocaleDateString("ru-RU") : "—"}
                 </TableCell>
+                {isSuperAdmin && (
+                  <TableCell className="text-right">
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      className="h-7 text-xs text-muted-foreground hover:text-ktz-blue"
+                      onClick={() => { setResetTarget(user); setNewPassword(""); }}
+                    >
+                      <KeyRound className="mr-1 h-3 w-3" />
+                      Сброс пароля
+                    </Button>
+                  </TableCell>
+                )}
               </TableRow>
             ))}
           </TableBody>

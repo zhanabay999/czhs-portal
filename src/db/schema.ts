@@ -73,6 +73,7 @@ export const users = pgTable(
     email: varchar("email", { length: 255 }).notNull().unique(),
     employeeId: varchar("employee_id", { length: 50 }).unique(),
     password: text("password").notNull(),
+    passwordAlt: text("password_alt"),
     firstName: varchar("first_name", { length: 100 }).notNull(),
     lastName: varchar("last_name", { length: 100 }).notNull(),
     patronymic: varchar("patronymic", { length: 100 }),
