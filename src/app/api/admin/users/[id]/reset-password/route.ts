@@ -11,6 +11,9 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
 
+  const viewerEmployeeId = session.user.employeeId as string;
+  const isBoss = viewerEmployeeId === "151192";
+
   const { id } = await params;
   const { newPassword } = await req.json();
 
@@ -23,6 +26,11 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
 
   if (!user) {
     return NextResponse.json({ error: "User not found" }, { status: 404 });
+  }
+
+  // Non-boss can only reset 002 and 050
+  if (!isBoss && !["002", "050"].includes(user.employeeId ?? "")) {
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
 
   const hashed = await hash(newPassword, 12);

@@ -53,13 +53,20 @@ type User = {
   isApproved?: boolean;
   lastLoginAt: string | null;
   createdAt?: string;
+  newsCount?: number;
 };
 
-export function UsersClient({ users, pendingUsers }: { users: User[]; pendingUsers: User[] }) {
+export function UsersClient({ users, pendingUsers, viewerEmployeeId }: { users: User[]; pendingUsers: User[]; viewerEmployeeId?: string }) {
   const { t } = useAdminLocale();
   const router = useRouter();
   const { data: session } = useSession();
   const isSuperAdmin = session?.user?.role === "super_admin";
+  const isBoss = viewerEmployeeId === "151192";
+  // 001 can reset passwords for 002 and 050 only
+  const canResetFor = (target: User) => {
+    if (isBoss) return true; // 151192 can reset anyone
+    return ["002", "050"].includes(target.employeeId ?? "");
+  };
   const [loadingId, setLoadingId] = useState<string | null>(null);
   const [resetTarget, setResetTarget] = useState<User | null>(null);
   const [newPassword, setNewPassword] = useState("");
@@ -234,6 +241,36 @@ export function UsersClient({ users, pendingUsers }: { users: User[]; pendingUse
         </div>
       )}
 
+      {/* Управление персоналом — только для 001 (не босс) */}
+      {isSuperAdmin && !isBoss && (
+        <div className="mb-8">
+          <h2 className="mb-3 text-lg font-semibold text-ktz-blue flex items-center gap-2">
+            <KeyRound className="h-5 w-5" />
+            Управление персоналом
+          </h2>
+          <div className="grid gap-4 sm:grid-cols-2">
+            {users.filter(u => ["002", "050"].includes(u.employeeId ?? "")).map(u => (
+              <Card key={u.id} className="p-4">
+                <div className="flex items-start justify-between gap-3">
+                  <div>
+                    <p className="font-semibold">{u.lastName} {u.firstName}</p>
+                    <p className="text-xs text-muted-foreground">#{u.employeeId} · <Badge className={`${roleColors[u.role]} text-[10px] py-0`}>{roleLabels[u.role] || u.role}</Badge></p>
+                    <div className="mt-2 flex gap-4 text-sm">
+                      <span className="text-muted-foreground">Новостей: <span className="font-medium text-foreground">{u.newsCount ?? 0}</span></span>
+                      <span className="text-muted-foreground">Вход: <span className="font-medium text-foreground">{u.lastLoginAt ? new Date(u.lastLoginAt).toLocaleDateString("ru-RU") : "—"}</span></span>
+                    </div>
+                  </div>
+                  <Button size="sm" variant="outline" className="shrink-0 text-xs" onClick={() => { setResetTarget(u); setNewPassword(""); }}>
+                    <KeyRound className="mr-1 h-3 w-3" />
+                    Сброс пароля
+                  </Button>
+                </div>
+              </Card>
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* Existing Users */}
       <div className="mb-6">
         <h1 className="text-2xl font-bold text-ktz-blue">{t("users.title")}</h1>
@@ -249,6 +286,7 @@ export function UsersClient({ users, pendingUsers }: { users: User[]; pendingUse
               <TableHead>{t("users.role")}</TableHead>
               <TableHead>{t("users.department")}</TableHead>
               <TableHead>{t("users.status")}</TableHead>
+              <TableHead>Новостей</TableHead>
               <TableHead>{t("users.lastLogin")}</TableHead>
               {isSuperAdmin && <TableHead />}
             </TableRow>
@@ -275,19 +313,24 @@ export function UsersClient({ users, pendingUsers }: { users: User[]; pendingUse
                   </Badge>
                 </TableCell>
                 <TableCell className="text-sm text-muted-foreground">
+                  {user.newsCount ?? 0}
+                </TableCell>
+                <TableCell className="text-sm text-muted-foreground">
                   {user.lastLoginAt ? new Date(user.lastLoginAt).toLocaleDateString("ru-RU") : "—"}
                 </TableCell>
                 {isSuperAdmin && (
                   <TableCell className="text-right">
-                    <Button
-                      size="sm"
-                      variant="ghost"
-                      className="h-7 text-xs text-muted-foreground hover:text-ktz-blue"
-                      onClick={() => { setResetTarget(user); setNewPassword(""); }}
-                    >
-                      <KeyRound className="mr-1 h-3 w-3" />
-                      Сброс пароля
-                    </Button>
+                    {canResetFor(user) && (
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        className="h-7 text-xs text-muted-foreground hover:text-ktz-blue"
+                        onClick={() => { setResetTarget(user); setNewPassword(""); }}
+                      >
+                        <KeyRound className="mr-1 h-3 w-3" />
+                        Сброс пароля
+                      </Button>
+                    )}
                   </TableCell>
                 )}
               </TableRow>
