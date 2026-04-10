@@ -8,7 +8,7 @@ const t: Record<string, Record<AdminLocale, string>> = {
   "sidebar.sanatorium": { kk: "Санаторий", ru: "Санаторий" },
   "sidebar.summerCamp": { kk: "Жазғы лагерь", ru: "Летний лагерь" },
   "sidebar.faq": { kk: "FAQ", ru: "FAQ" },
-  "sidebar.contest": { kk: "ЦЖС-Аруы", ru: "ЦЖС-Аруы" },
+  "sidebar.contest": { kk: "Конкурстар", ru: "Конкурсы" },
   "sidebar.sports": { kk: "Спорт", ru: "Спорт" },
   "sidebar.sportsApplications": { kk: "Спорт өтінімдер", ru: "Заявки спортсменов" },
   "sidebar.patronage": { kk: "Патронаж", ru: "Патронаж" },
@@ -138,7 +138,7 @@ const t: Record<string, Record<AdminLocale, string>> = {
   "camp.desc": { kk: "Ауысымдарды, фотогалереяны және құжаттарды басқарыңыз", ru: "Управляйте сменами, фотогалереей и документами" },
 
   // Contest
-  "contest.title": { kk: "ЦЖС-Аруы", ru: "ЦЖС-Аруы" },
+  "contest.title": { kk: "Конкурстар", ru: "Конкурсы" },
   "contest.contestants": { kk: "Қатысушылар", ru: "Участницы" },
   "contest.votes": { kk: "Дауыстар", ru: "Голоса" },
   "contest.empty": { kk: "Конкурстар жоқ", ru: "Нет конкурсов" },
