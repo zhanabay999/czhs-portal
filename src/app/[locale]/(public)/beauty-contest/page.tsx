@@ -1,13 +1,13 @@
 import { useTranslations } from "next-intl";
 import { setRequestLocale } from "next-intl/server";
 import { db } from "@/db";
-import { contests, contestants, votes } from "@/db/schema";
-import { desc, eq, sql } from "drizzle-orm";
+import { contests, contestants, votes, contestBlocks } from "@/db/schema";
+import { desc, eq, sql, asc } from "drizzle-orm";
 import { Link } from "@/i18n/routing";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Crown, Users, Vote, ArrowRight } from "lucide-react";
+import { Crown, Users, Vote, ArrowRight, ExternalLink } from "lucide-react";
 
 type Props = { params: Promise<{ locale: string }> };
 
@@ -19,6 +19,7 @@ export default async function BeautyContestPage({ params }: Props) {
   let contest = null;
   let contestantsList: Array<typeof contestants.$inferSelect> = [];
   let voteCount = 0;
+  let blocks: typeof contestBlocks.$inferSelect[] = [];
 
   try {
     const [c] = await db.select().from(contests).orderBy(desc(contests.year)).limit(1);
@@ -28,16 +29,18 @@ export default async function BeautyContestPage({ params }: Props) {
       const [vc] = await db.select({ count: sql<number>`count(*)` }).from(votes).where(eq(votes.contestId, contest.id));
       voteCount = Number(vc.count);
     }
+    blocks = await db.select().from(contestBlocks).where(eq(contestBlocks.isActive, true)).orderBy(asc(contestBlocks.sortOrder));
   } catch {}
 
-  return <ContestContent locale={locale} isKk={isKk} contest={contest} contestantsList={contestantsList} voteCount={voteCount} />;
+  return <ContestContent locale={locale} isKk={isKk} contest={contest} contestantsList={contestantsList} voteCount={voteCount} blocks={blocks} />;
 }
 
-function ContestContent({ locale, isKk, contest, contestantsList, voteCount }: {
+function ContestContent({ locale, isKk, contest, contestantsList, voteCount, blocks }: {
   locale: string; isKk: boolean;
   contest: typeof contests.$inferSelect | null;
   contestantsList: Array<typeof contestants.$inferSelect>;
   voteCount: number;
+  blocks: typeof contestBlocks.$inferSelect[];
 }) {
   const t = useTranslations("contest");
 
@@ -51,8 +54,41 @@ function ContestContent({ locale, isKk, contest, contestantsList, voteCount }: {
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="mb-6 border-b-2 border-[#003DA5] pb-3">
-        <h1 className="text-2xl font-bold text-[#003DA5]">{t("title")}</h1>
+        <h1 className="text-2xl font-bold text-[#003DA5]">{isKk ? "Конкурстар" : "Конкурсы"}</h1>
       </div>
+
+      {/* Contest blocks */}
+      {blocks.length > 0 && (
+        <section className="mb-10">
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {blocks.map((block) => (
+              <Card key={block.id} className="overflow-hidden">
+                <img
+                  src={block.imageUrl}
+                  alt={isKk ? block.titleKk : block.titleRu}
+                  className="h-48 w-full object-cover"
+                />
+                <CardContent className="p-4">
+                  <h3 className="mb-2 font-semibold text-[#003DA5]">
+                    {isKk ? block.titleKk : block.titleRu}
+                  </h3>
+                  {block.linkUrl && (
+                    <a
+                      href={block.linkUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1 text-sm text-[#003DA5] hover:underline"
+                    >
+                      {block.linkLabel || (isKk ? "Толығырақ" : "Подробнее")}
+                      <ExternalLink className="h-3 w-3" />
+                    </a>
+                  )}
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </section>
+      )}
 
       {contest ? (
         <>

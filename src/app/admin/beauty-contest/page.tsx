@@ -1,7 +1,8 @@
 import { db } from "@/db";
-import { contests, contestants, votes } from "@/db/schema";
-import { desc, eq, sql } from "drizzle-orm";
+import { contests, contestants, votes, contestBlocks } from "@/db/schema";
+import { desc, eq, sql, asc } from "drizzle-orm";
 import { ContestClient } from "./ContestClient";
+import { ContestBlocksSection } from "./ContestBlocksSection";
 
 export default async function AdminContestPage() {
   let contestList: Array<{
@@ -13,6 +14,8 @@ export default async function AdminContestPage() {
     contestantsCount: number;
     votesCount: number;
   }> = [];
+
+  let blocks: typeof contestBlocks.$inferSelect[] = [];
 
   try {
     const raw = await db.select().from(contests).orderBy(desc(contests.year));
@@ -29,7 +32,13 @@ export default async function AdminContestPage() {
         votesCount: Number(vc.count),
       });
     }
+    blocks = await db.select().from(contestBlocks).orderBy(asc(contestBlocks.sortOrder));
   } catch {}
 
-  return <ContestClient contests={contestList} />;
+  return (
+    <div>
+      <ContestBlocksSection initialBlocks={JSON.parse(JSON.stringify(blocks))} />
+      <ContestClient contests={contestList} />
+    </div>
+  );
 }

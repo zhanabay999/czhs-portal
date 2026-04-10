@@ -33,18 +33,18 @@ export function Footer() {
             </p>
             <div className="flex flex-col gap-3">
               <a
-                href="tel:+XXXXXXXXXX"
+                href="tel:+77710553449"
                 className="flex items-center gap-2 text-sm text-background/60 transition-colors hover:text-background"
               >
                 <Phone className="h-4 w-4" />
-                +X(XXXX) XX-XX-XX
+                +7 (771) 055 34 49
               </a>
               <a
-                href="mailto:info@czhs.kz"
+                href="mailto:czhstime@railways.kz"
                 className="flex items-center gap-2 text-sm text-background/60 transition-colors hover:text-background"
               >
                 <Mail className="h-4 w-4" />
-                info@czhs.kz
+                czhstime@railways.kz
               </a>
               <div className="flex items-start gap-2 text-sm text-background/60">
                 <MapPin className="mt-0.5 h-4 w-4 shrink-0" />

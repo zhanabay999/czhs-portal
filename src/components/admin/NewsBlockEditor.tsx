@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -17,6 +17,8 @@ import {
   ChevronUp,
   ChevronDown,
   ImagePlus,
+  Upload,
+  Loader2,
 } from "lucide-react";
 
 // ─── Block types ────────────────────────────────────────────
@@ -397,6 +399,8 @@ function CarouselBlockEditor({
   locale: string;
 }) {
   const isKk = locale === "kk";
+  const [uploadingIdx, setUploadingIdx] = useState<number | null>(null);
+  const fileRefs = useRef<(HTMLInputElement | null)[]>([]);
 
   const addImage = () => {
     onChange({
@@ -405,11 +409,7 @@ function CarouselBlockEditor({
     });
   };
 
-  const updateImage = (
-    idx: number,
-    field: "url" | "caption",
-    value: string
-  ) => {
+  const updateImage = (idx: number, field: "url" | "caption", value: string) => {
     const images = [...block.images];
     images[idx] = { ...images[idx], [field]: value };
     onChange({ ...block, images });
@@ -417,10 +417,24 @@ function CarouselBlockEditor({
 
   const removeImage = (idx: number) => {
     if (block.images.length <= 1) return;
-    onChange({
-      ...block,
-      images: block.images.filter((_, i) => i !== idx),
-    });
+    onChange({ ...block, images: block.images.filter((_, i) => i !== idx) });
+  };
+
+  const handleFileUpload = async (idx: number, file: File) => {
+    setUploadingIdx(idx);
+    try {
+      const fd = new FormData();
+      fd.append("file", file);
+      fd.append("folder", "news");
+      const res = await fetch("/api/upload", { method: "POST", body: fd });
+      if (!res.ok) throw new Error();
+      const data = await res.json();
+      updateImage(idx, "url", data.url);
+    } catch {
+      // silent fail
+    } finally {
+      setUploadingIdx(null);
+    }
   };
 
   return (
@@ -428,12 +442,37 @@ function CarouselBlockEditor({
       {block.images.map((img, idx) => (
         <div key={idx} className="flex gap-2">
           <div className="flex-1 space-y-1.5">
-            <Input
-              value={img.url}
-              onChange={(e) => updateImage(idx, "url", e.target.value)}
-              placeholder={`${isKk ? "Сурет" : "Фото"} ${idx + 1} URL`}
-              className="text-sm"
-            />
+            <div className="flex gap-1">
+              <Input
+                value={img.url}
+                onChange={(e) => updateImage(idx, "url", e.target.value)}
+                placeholder={`${isKk ? "Сурет" : "Фото"} ${idx + 1} URL`}
+                className="text-sm flex-1"
+              />
+              <Button
+                type="button"
+                variant="outline"
+                size="icon"
+                className="h-9 w-9 shrink-0"
+                onClick={() => fileRefs.current[idx]?.click()}
+                disabled={uploadingIdx === idx}
+              >
+                {uploadingIdx === idx
+                  ? <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                  : <Upload className="h-3.5 w-3.5" />}
+              </Button>
+              <input
+                ref={(el) => { fileRefs.current[idx] = el; }}
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  if (file) handleFileUpload(idx, file);
+                  e.target.value = "";
+                }}
+              />
+            </div>
             <Input
               value={img.caption}
               onChange={(e) => updateImage(idx, "caption", e.target.value)}
@@ -447,9 +486,7 @@ function CarouselBlockEditor({
                 src={img.url}
                 alt=""
                 className="h-full w-full object-cover"
-                onError={(e) => {
-                  (e.target as HTMLImageElement).style.display = "none";
-                }}
+                onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
               />
             </div>
           )}

@@ -555,6 +555,26 @@ export const leaders = pgTable("leaders", {
 export type Leader = typeof leaders.$inferSelect;
 
 // ============================================================
+// CONTEST BLOCKS (Конкурс блоктары)
+// ============================================================
+
+export const contestBlocks = pgTable("contest_blocks", {
+  id: text("id")
+    .primaryKey()
+    .$defaultFn(() => crypto.randomUUID()),
+  titleKk: varchar("title_kk", { length: 255 }).notNull(),
+  titleRu: varchar("title_ru", { length: 255 }).notNull(),
+  imageUrl: text("image_url").notNull(),
+  linkUrl: text("link_url"),
+  linkLabel: varchar("link_label", { length: 100 }),
+  isActive: boolean("is_active").default(true).notNull(),
+  sortOrder: integer("sort_order").default(0).notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export type ContestBlock = typeof contestBlocks.$inferSelect;
+
+// ============================================================
 // SYSTEM
 // ============================================================
 
