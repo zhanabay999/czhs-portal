@@ -1,6 +1,6 @@
 import { setRequestLocale } from "next-intl/server";
 import { Link } from "@/i18n/routing";
-import { ArrowLeft, Heart } from "lucide-react";
+import { ArrowLeft, Heart, HeartHandshake } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 type Props = { params: Promise<{ locale: string }> };
@@ -107,6 +107,17 @@ export default async function ZhylyZhurekpenPage({ params }: Props) {
             </>
           )}
         </div>
+      </div>
+
+      {/* Кнопка Патронаж */}
+      <div className="mt-10 flex justify-center">
+        <Link
+          href="/zhyly-zhurekpen/patronage"
+          className="inline-flex items-center gap-2 rounded-lg bg-ktz-blue px-8 py-4 text-lg font-semibold text-white shadow-lg transition-all hover:bg-ktz-blue/90 hover:-translate-y-0.5 hover:shadow-xl"
+        >
+          <HeartHandshake className="h-5 w-5" />
+          {isKk ? "Патронаж" : "Патронаж"}
+        </Link>
       </div>
 
       {/* Наши партнёры */}

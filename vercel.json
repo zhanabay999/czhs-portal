@@ -1,0 +1,8 @@
+{
+  "crons": [
+    {
+      "path": "/api/admin/auto-archive",
+      "schedule": "0 0 16 * *"
+    }
+  ]
+}

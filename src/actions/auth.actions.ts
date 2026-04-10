@@ -56,3 +56,41 @@ export async function registerUser(data: {
 
   return { success: true };
 }
+
+export async function changePassword(data: {
+  userId: string;
+  currentPassword: string;
+  newPassword: string;
+}) {
+  if (!data.currentPassword.trim() || !data.newPassword.trim()) {
+    return { error: "required" };
+  }
+
+  if (data.newPassword.length < 4) {
+    return { error: "passwordTooShort" };
+  }
+
+  const [user] = await db
+    .select({ id: users.id, password: users.password })
+    .from(users)
+    .where(eq(users.id, data.userId))
+    .limit(1);
+
+  if (!user) {
+    return { error: "userNotFound" };
+  }
+
+  const { compare } = await import("bcryptjs");
+  const isValid = await compare(data.currentPassword, user.password);
+  if (!isValid) {
+    return { error: "wrongPassword" };
+  }
+
+  const hashedPassword = await hash(data.newPassword, 12);
+  await db
+    .update(users)
+    .set({ password: hashedPassword, updatedAt: new Date() })
+    .where(eq(users.id, data.userId));
+
+  return { success: true };
+}

@@ -16,6 +16,11 @@ import {
   Settings,
   LogOut,
   Train,
+  ClipboardList,
+  HeartHandshake,
+  UserCog,
+  User,
+  ImageIcon,
   ChevronLeft,
   Home,
   Globe,
@@ -44,6 +49,10 @@ const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
   Trophy,
   Users,
   Settings,
+  ClipboardList,
+  HeartHandshake,
+  UserCog,
+  ImageIcon,
 };
 
 const sidebarKeyMap: Record<string, string> = {
@@ -54,6 +63,10 @@ const sidebarKeyMap: Record<string, string> = {
   faq: "sidebar.faq",
   contest: "sidebar.contest",
   sports: "sidebar.sports",
+  sportsApplications: "sidebar.sportsApplications",
+  patronage: "sidebar.patronage",
+  heroSlides: "sidebar.heroSlides",
+  leadership: "sidebar.leadership",
   users: "sidebar.users",
   settings: "sidebar.settings",
 };
@@ -176,6 +189,19 @@ function SidebarContent({
         {!collapsed && (
           <p className="mb-2 truncate px-3 text-xs text-gray-500">{userName}</p>
         )}
+        <Link
+          href="/admin/profile"
+          onClick={onNavClick}
+          className={`flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors ${
+            pathname === "/admin/profile"
+              ? "bg-sidebar-accent text-white"
+              : "text-gray-400 hover:bg-sidebar-accent/50 hover:text-white"
+          }`}
+          title={collapsed ? t("sidebar.profile") : undefined}
+        >
+          <User className="h-5 w-5 shrink-0" />
+          {!collapsed && <span>{t("sidebar.profile")}</span>}
+        </Link>
         <Link
           href="/kk"
           onClick={onNavClick}

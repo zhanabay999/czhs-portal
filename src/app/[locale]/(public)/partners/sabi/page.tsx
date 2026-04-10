@@ -7,25 +7,32 @@ import { BackButton } from "@/components/ui/back-button";
 type Props = { params: Promise<{ locale: string }> };
 
 const scheduleData = [
-  { date: "1 марта", stream: 1, age: "0-8 лет", count: 73, region: "Акмолинская обл, Астана, Караганда" },
-  { date: "15 марта", stream: 2, age: "0-8 лет", count: 58, region: "Атырау, Актобе, Мангистау" },
-  { date: "29 марта", stream: 3, age: "0-8 лет", count: 58, region: "Атырау, Актобе, Мангистау" },
-  { date: "12 апреля", stream: 4, age: "0-8 лет", count: 48, region: "Алматы, Шымкент" },
-  { date: "26 апреля", stream: 5, age: "0-8 лет", count: 64, region: "Жамбыл, Кызылорда" },
-  { date: "10 мая", stream: 6, age: "0-8 лет", count: 72, region: "Костанай, Семей, Павлодар" },
-  { date: "24 мая", stream: 7, age: "9-16 лет", count: 53, region: "Акмолинская обл, Астана, Караганда" },
-  { date: "7 июня", stream: 8, age: "9-16 лет", count: 53, region: "Акмолинская обл, Астана, Караганда" },
-  { date: "21 июня", stream: 9, age: "9-16 лет", count: 50, region: "Атырау, Актобе, Мангистау" },
-  { date: "2 августа", stream: 10, age: "9-16 лет", count: 50, region: "Атырау, Актобе, Мангистау" },
-  { date: "16 августа", stream: 11, age: "9-16 лет", count: 51, region: "Атырау, Актобе, Мангистау" },
-  { date: "30 августа", stream: 12, age: "9-16 лет", count: 71, region: "Алматы, Шымкент" },
-  { date: "13 сентября", stream: 13, age: "9-17 лет", count: 50, region: "Жамбыл, Кызылорда" },
-  { date: "27 сентября", stream: 14, age: "9-17 лет", count: 51, region: "Жамбыл, Кызылорда" },
-  { date: "11 октября", stream: 15, age: "9-16 лет", count: 57, region: "Костанай, Семей, Павлодар" },
-  { date: "25 октября", stream: 16, age: "9-16 лет", count: 57, region: "Костанай, Семей, Павлодар" },
-  { date: "1 ноября", stream: 17, age: "17-18 лет", count: 50, region: "Все регионы (за исключением детей 17 лет из Жамбыла и Кызылорды — они в 13, 14 потоках)" },
-  { date: "15 ноября", stream: 18, age: "18-33 года", count: 50, region: "Все регионы" },
+  { dateRu: "1 марта", dateKk: "1 наурыз", dateISO: "2026-03-01", stream: 1, ageRu: "0-8 лет", ageKk: "0-8 жас", count: 73, regionRu: "Акмолинская обл, Астана, Караганда", regionKk: "Ақмола обл, Астана, Қарағанды" },
+  { dateRu: "15 марта", dateKk: "15 наурыз", dateISO: "2026-03-15", stream: 2, ageRu: "0-8 лет", ageKk: "0-8 жас", count: 58, regionRu: "Атырау, Актобе, Мангистау", regionKk: "Атырау, Ақтөбе, Маңғыстау" },
+  { dateRu: "29 марта", dateKk: "29 наурыз", dateISO: "2026-03-29", stream: 3, ageRu: "0-8 лет", ageKk: "0-8 жас", count: 58, regionRu: "Атырау, Актобе, Мангистау", regionKk: "Атырау, Ақтөбе, Маңғыстау" },
+  { dateRu: "12 апреля", dateKk: "12 сәуір", dateISO: "2026-04-12", stream: 4, ageRu: "0-8 лет", ageKk: "0-8 жас", count: 48, regionRu: "Алматы, Шымкент", regionKk: "Алматы, Шымкент" },
+  { dateRu: "26 апреля", dateKk: "26 сәуір", dateISO: "2026-04-26", stream: 5, ageRu: "0-8 лет", ageKk: "0-8 жас", count: 64, regionRu: "Жамбыл, Кызылорда", regionKk: "Жамбыл, Қызылорда" },
+  { dateRu: "10 мая", dateKk: "10 мамыр", dateISO: "2026-05-10", stream: 6, ageRu: "0-8 лет", ageKk: "0-8 жас", count: 72, regionRu: "Костанай, Семей, Павлодар", regionKk: "Қостанай, Семей, Павлодар" },
+  { dateRu: "24 мая", dateKk: "24 мамыр", dateISO: "2026-05-24", stream: 7, ageRu: "9-16 лет", ageKk: "9-16 жас", count: 53, regionRu: "Акмолинская обл, Астана, Караганда", regionKk: "Ақмола обл, Астана, Қарағанды" },
+  { dateRu: "7 июня", dateKk: "7 маусым", dateISO: "2026-06-07", stream: 8, ageRu: "9-16 лет", ageKk: "9-16 жас", count: 53, regionRu: "Акмолинская обл, Астана, Караганда", regionKk: "Ақмола обл, Астана, Қарағанды" },
+  { dateRu: "21 июня", dateKk: "21 маусым", dateISO: "2026-06-21", stream: 9, ageRu: "9-16 лет", ageKk: "9-16 жас", count: 50, regionRu: "Атырау, Актобе, Мангистау", regionKk: "Атырау, Ақтөбе, Маңғыстау" },
+  { dateRu: "2 августа", dateKk: "2 тамыз", dateISO: "2026-08-02", stream: 10, ageRu: "9-16 лет", ageKk: "9-16 жас", count: 50, regionRu: "Атырау, Актобе, Мангистау", regionKk: "Атырау, Ақтөбе, Маңғыстау" },
+  { dateRu: "16 августа", dateKk: "16 тамыз", dateISO: "2026-08-16", stream: 11, ageRu: "9-16 лет", ageKk: "9-16 жас", count: 51, regionRu: "Атырау, Актобе, Мангистау", regionKk: "Атырау, Ақтөбе, Маңғыстау" },
+  { dateRu: "30 августа", dateKk: "30 тамыз", dateISO: "2026-08-30", stream: 12, ageRu: "9-16 лет", ageKk: "9-16 жас", count: 71, regionRu: "Алматы, Шымкент", regionKk: "Алматы, Шымкент" },
+  { dateRu: "13 сентября", dateKk: "13 қыркүйек", dateISO: "2026-09-13", stream: 13, ageRu: "9-17 лет", ageKk: "9-17 жас", count: 50, regionRu: "Жамбыл, Кызылорда", regionKk: "Жамбыл, Қызылорда" },
+  { dateRu: "27 сентября", dateKk: "27 қыркүйек", dateISO: "2026-09-27", stream: 14, ageRu: "9-17 лет", ageKk: "9-17 жас", count: 51, regionRu: "Жамбыл, Кызылорда", regionKk: "Жамбыл, Қызылорда" },
+  { dateRu: "11 октября", dateKk: "11 қазан", dateISO: "2026-10-11", stream: 15, ageRu: "9-16 лет", ageKk: "9-16 жас", count: 57, regionRu: "Костанай, Семей, Павлодар", regionKk: "Қостанай, Семей, Павлодар" },
+  { dateRu: "25 октября", dateKk: "25 қазан", dateISO: "2026-10-25", stream: 16, ageRu: "9-16 лет", ageKk: "9-16 жас", count: 57, regionRu: "Костанай, Семей, Павлодар", regionKk: "Қостанай, Семей, Павлодар" },
+  { dateRu: "1 ноября", dateKk: "1 қараша", dateISO: "2026-11-01", stream: 17, ageRu: "17-18 лет", ageKk: "17-18 жас", count: 50, regionRu: "Все регионы (за исключением детей 17 лет из Жамбыла и Кызылорды — они в 13, 14 потоках)", regionKk: "Барлық аймақтар (Жамбыл мен Қызылордадан 17 жастағы балаларды қоспағанда — олар 13, 14 ағындарда)" },
+  { dateRu: "15 ноября", dateKk: "15 қараша", dateISO: "2026-11-15", stream: 18, ageRu: "18-33 года", ageKk: "18-33 жас", count: 50, regionRu: "Все регионы", regionKk: "Барлық аймақтар" },
 ];
+
+function isPastDate(dateISO: string): boolean {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const eventDate = new Date(dateISO + "T23:59:59");
+  return eventDate < today;
+}
 
 export default async function SabiHealthPage({ params }: Props) {
   const { locale } = await params;
@@ -129,15 +136,18 @@ export default async function SabiHealthPage({ params }: Props) {
               </tr>
             </thead>
             <tbody>
-              {scheduleData.map((row) => (
-                <tr key={row.stream} className="border-b border-border last:border-0 hover:bg-secondary/30">
-                  <td className="whitespace-nowrap px-3 py-2.5">{row.date}</td>
-                  <td className="px-3 py-2.5 text-center">{row.stream}</td>
-                  <td className="whitespace-nowrap px-3 py-2.5 text-center">{row.age}</td>
-                  <td className="px-3 py-2.5 text-center">{row.count}</td>
-                  <td className="px-3 py-2.5 text-gray-600">{row.region}</td>
-                </tr>
-              ))}
+              {scheduleData.map((row) => {
+                const past = isPastDate(row.dateISO);
+                return (
+                  <tr key={row.stream} className={`border-b border-border last:border-0 ${past ? "bg-green-100 text-green-900" : "hover:bg-secondary/30"}`}>
+                    <td className="whitespace-nowrap px-3 py-2.5 font-medium">{isKk ? row.dateKk : row.dateRu} {past && "✓"}</td>
+                    <td className="px-3 py-2.5 text-center">{row.stream}</td>
+                    <td className="whitespace-nowrap px-3 py-2.5 text-center">{isKk ? row.ageKk : row.ageRu}</td>
+                    <td className="px-3 py-2.5 text-center">{row.count}</td>
+                    <td className={`px-3 py-2.5 ${past ? "text-green-800" : "text-gray-600"}`}>{isKk ? row.regionKk : row.regionRu}</td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </div>

@@ -65,6 +65,8 @@ export async function createNewsArticle(data: {
   contentKk: string;
   contentRu: string;
   coverImageUrl?: string;
+  coverImageUrlKk?: string;
+  coverImageUrlRu?: string;
   categoryId?: string;
   status: "draft" | "published";
   isInternal?: boolean;
@@ -94,6 +96,8 @@ export async function createNewsArticle(data: {
     contentKk: data.contentKk,
     contentRu: data.contentRu,
     coverImageUrl: data.coverImageUrl || null,
+    coverImageUrlKk: data.coverImageUrlKk || null,
+    coverImageUrlRu: data.coverImageUrlRu || null,
     categoryId: data.categoryId || null,
     authorId: session.user.id,
     status: data.status,
@@ -124,6 +128,8 @@ export async function updateNewsArticle(
     contentKk: string;
     contentRu: string;
     coverImageUrl?: string;
+    coverImageUrlKk?: string;
+    coverImageUrlRu?: string;
     categoryId?: string;
     status: "draft" | "published" | "archived";
     isInternal?: boolean;
@@ -157,6 +163,8 @@ export async function updateNewsArticle(
       contentKk: data.contentKk,
       contentRu: data.contentRu,
       coverImageUrl: data.coverImageUrl || null,
+      coverImageUrlKk: data.coverImageUrlKk || null,
+      coverImageUrlRu: data.coverImageUrlRu || null,
       categoryId: data.categoryId || null,
       status: data.status,
       isInternal: data.isInternal || false,
@@ -174,6 +182,8 @@ export async function updateNewsArticle(
   revalidatePath("/admin/news");
   revalidatePath("/kk/news");
   revalidatePath("/ru/news");
+  revalidatePath(`/kk/news/${existing.slug}`);
+  revalidatePath(`/ru/news/${existing.slug}`);
   revalidatePath("/kk");
   revalidatePath("/ru");
 }

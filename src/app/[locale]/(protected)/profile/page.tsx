@@ -7,6 +7,7 @@ import { eq } from "drizzle-orm";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { User, Mail, Phone, Building2, Briefcase, Shield, Calendar } from "lucide-react";
+import { ChangePasswordForm } from "./ChangePasswordForm";
 
 type Props = { params: Promise<{ locale: string }> };
 
@@ -63,6 +64,8 @@ export default async function ProfilePage({ params }: Props) {
           </div>
         </CardContent>
       </Card>
+
+      <ChangePasswordForm userId={user.id} locale={locale} />
     </div>
   );
 }

@@ -4,6 +4,7 @@ import { useTranslations } from "next-intl";
 import { useLocale } from "next-intl";
 import { Link } from "@/i18n/routing";
 import { Mail, Phone, MapPin, ExternalLink } from "lucide-react";
+import { InstallAppButton } from "@/components/InstallAppButton";
 
 export function Footer() {
   const t = useTranslations("nav");
@@ -12,6 +13,7 @@ export function Footer() {
   const isKk = locale === "kk";
 
   return (
+    <>
     <footer id="footer" className="bg-foreground">
       <div className="mx-auto max-w-7xl px-4 py-12 lg:px-8 lg:py-16">
         <div className="grid gap-10 lg:grid-cols-5">
@@ -187,9 +189,16 @@ export function Footer() {
             >
               job.railways.kz
             </a>
+            <Link href="/login" className="transition-colors hover:text-background/60">
+              {tc("login")}
+            </Link>
           </div>
         </div>
       </div>
     </footer>
+
+      {/* Mobile install PWA button */}
+      <InstallAppButton />
+    </>
   );
 }

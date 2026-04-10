@@ -24,7 +24,7 @@ export default async function NewsArticlePage({ params }: Props) {
     .where(eq(newsArticles.slug, slug))
     .limit(1);
 
-  if (!article || article.status !== "published") {
+  if (!article || (article.status !== "published" && article.status !== "archived")) {
     notFound();
   }
 
