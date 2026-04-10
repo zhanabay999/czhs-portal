@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -26,6 +27,7 @@ type UserProfile = {
 
 export function ProfileClient({ user }: { user: UserProfile }) {
   const { t, locale } = useAdminLocale();
+  const { update } = useSession();
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
 
@@ -63,6 +65,7 @@ export function ProfileClient({ user }: { user: UserProfile }) {
         });
         if (res.ok) {
           toast.success(locale === "kk" ? "Профиль сақталды" : "Профиль сохранён");
+          await update({ firstName: form.firstName, lastName: form.lastName, name: `${form.firstName} ${form.lastName}` });
           router.refresh();
         } else {
           toast.error(locale === "kk" ? "Қате" : "Ошибка");

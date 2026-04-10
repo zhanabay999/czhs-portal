@@ -50,16 +50,25 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           role: user.role,
           employeeId: user.employeeId,
           department: user.department,
+          firstName: user.firstName,
+          lastName: user.lastName,
         };
       },
     }),
   ],
   callbacks: {
-    async jwt({ token, user }) {
+    async jwt({ token, user, trigger, session }) {
       if (user) {
         token.role = user.role;
         token.employeeId = user.employeeId;
         token.department = user.department;
+        token.firstName = (user as { firstName?: string }).firstName;
+        token.lastName = (user as { lastName?: string }).lastName;
+      }
+      if (trigger === "update" && session) {
+        if (session.firstName) token.firstName = session.firstName;
+        if (session.lastName) token.lastName = session.lastName;
+        if (session.name) token.name = session.name;
       }
       return token;
     },
@@ -69,6 +78,9 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         session.user.role = token.role as string;
         session.user.employeeId = token.employeeId as string;
         session.user.department = token.department as string;
+        if (token.firstName && token.lastName) {
+          session.user.name = `${token.firstName} ${token.lastName}`;
+        }
       }
       return session;
     },
