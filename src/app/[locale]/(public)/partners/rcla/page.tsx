@@ -86,7 +86,7 @@ export default async function RCLAPage({ params }: Props) {
                   {isKk ? "Жетекші" : "Руководитель"}
                 </th>
                 <th className="px-3 py-3 text-center font-semibold text-foreground">
-                  {isKk ? "Отбасы саны" : "Кол-во семей"}
+                  {isKk ? "Отбасы саны" : "Количество семей"}
                 </th>
                 <th className="px-3 py-3 text-left font-semibold text-foreground">
                   {isKk ? "Қабылдау кестесі" : "График приема"}
@@ -118,7 +118,21 @@ export default async function RCLAPage({ params }: Props) {
                   <td className="px-3 py-2.5 text-gray-700">{row.head}</td>
                   <td className="px-3 py-2.5 text-center font-semibold">{row.count}</td>
                   <td className="px-3 py-2.5 text-gray-600">{row.schedule}</td>
-                  <td className="whitespace-pre-line px-3 py-2.5 text-xs text-gray-600">{row.contacts}</td>
+                  <td className="px-3 py-2.5">
+                    <ul className="space-y-1">
+                      {row.contacts.split("\n").map((c, i) => {
+                        const match = c.match(/^(.*?)(\+7[\d\s]+)(.*)$/);
+                        if (match) {
+                          return (
+                            <li key={i} className="text-xs text-gray-700">
+                              {match[1]}<a href={`tel:${match[2].replace(/\s/g, "")}`} className="font-medium text-[#003DA5] whitespace-nowrap hover:underline">{match[2]}</a>{match[3]}
+                            </li>
+                          );
+                        }
+                        return <li key={i} className="text-xs text-gray-700">{c}</li>;
+                      })}
+                    </ul>
+                  </td>
                 </tr>
               ))}
               <tr className="border-t-2 border-border bg-secondary/50 font-semibold">
