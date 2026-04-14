@@ -118,14 +118,14 @@ export default async function RCLAPage({ params }: Props) {
                   <td className="px-3 py-2.5 text-gray-700">{row.head}</td>
                   <td className="px-3 py-2.5 text-center font-semibold">{row.count}</td>
                   <td className="px-3 py-2.5 text-gray-600">{row.schedule}</td>
-                  <td className="px-3 py-2.5">
+                  <td className="px-3 py-2.5 max-w-[300px]">
                     <ul className="space-y-1">
                       {row.contacts.split("\n").map((c, i) => {
                         const match = c.match(/^(.*?)(\+7[\d\s]+)(.*)$/);
                         if (match) {
                           return (
                             <li key={i} className="text-xs text-gray-700">
-                              {match[1]}<a href={`tel:${match[2].replace(/\s/g, "")}`} className="font-medium text-[#003DA5] whitespace-nowrap hover:underline">{match[2]}</a>{match[3]}
+                              {match[1]}<a href={`tel:${match[2].replace(/\s/g, "")}`} className="font-medium text-[#003DA5] hover:underline">{match[2]}</a>{match[3]}
                             </li>
                           );
                         }
