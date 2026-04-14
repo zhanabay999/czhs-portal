@@ -166,14 +166,22 @@ export function Header() {
             </div>
 
             {/* Language Switcher */}
-            <Link
-              href={pathname}
-              locale={otherLocale}
-              className="hidden items-center gap-1.5 rounded-md px-3 py-2 text-sm text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground md:flex"
-            >
-              <Globe className="h-4 w-4" />
-              <span className="text-xs">{locale === "kk" ? "RU" : "ҚАЗ"}</span>
-            </Link>
+            <div className="hidden items-center gap-0.5 md:flex">
+              <Link
+                href={pathname}
+                locale="kk"
+                className={`rounded-md px-2.5 py-1.5 text-xs font-semibold transition-colors ${locale === "kk" ? "bg-ktz-blue text-white" : "text-muted-foreground hover:bg-secondary hover:text-foreground"}`}
+              >
+                ҚАЗ
+              </Link>
+              <Link
+                href={pathname}
+                locale="ru"
+                className={`rounded-md px-2.5 py-1.5 text-xs font-semibold transition-colors ${locale === "ru" ? "bg-ktz-blue text-white" : "text-muted-foreground hover:bg-secondary hover:text-foreground"}`}
+              >
+                РУС
+              </Link>
+            </div>
 
             {/* Auth */}
             {session ? (
