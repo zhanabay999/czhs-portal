@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import { setRequestLocale } from "next-intl/server";
 import { Link } from "@/i18n/routing";
 import { ExternalLink } from "lucide-react";
