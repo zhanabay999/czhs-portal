@@ -91,7 +91,7 @@ export default async function RCLAPage({ params }: Props) {
                 <th className="px-3 py-3 text-left font-semibold text-foreground">
                   {isKk ? "Қабылдау кестесі" : "График приема"}
                 </th>
-                <th className="px-3 py-3 text-left font-semibold text-foreground">
+                <th className="min-w-[280px] px-3 py-3 text-left font-semibold text-foreground">
                   {isKk ? "Байланыс" : "Контакты"}
                 </th>
               </tr>
