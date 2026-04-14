@@ -15,27 +15,41 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "No file" }, { status: 400 });
   }
 
-  const allowedTypes = ["image/jpeg", "image/png", "image/webp", "image/gif", "image/heic", "image/heif", "image/bmp", "image/tiff"];
+  const allowedTypes = [
+    "image/jpeg", "image/png", "image/webp", "image/gif",
+    "image/heic", "image/heif", "image/bmp", "image/tiff",
+  ];
   if (!allowedTypes.includes(file.type)) {
     return NextResponse.json({ error: "Invalid file type" }, { status: 400 });
   }
 
-  if (file.size > 5 * 1024 * 1024) {
-    return NextResponse.json({ error: "File too large (max 5MB)" }, { status: 400 });
+  if (file.size > 20 * 1024 * 1024) {
+    return NextResponse.json({ error: "File too large (max 20MB)" }, { status: 400 });
   }
 
-  const ext = file.name.split(".").pop() || "jpg";
-  const safeName = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
+  const safeName = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}.jpg`;
 
-  // If Vercel Blob token is configured — use cloud storage (Vercel deployment)
-  // Otherwise — save to local filesystem (self-hosted server).
-  // We use createRequire so neither webpack nor turbopack try to bundle @vercel/blob.
+  // Compress image with sharp
+  const bytes = new Uint8Array(await file.arrayBuffer());
+  let compressed: Buffer;
+  try {
+    const sharp = (await import("sharp")).default;
+    compressed = await sharp(bytes)
+      .resize({ width: 1920, height: 1920, fit: "inside", withoutEnlargement: true })
+      .jpeg({ quality: 82, progressive: true })
+      .toBuffer();
+  } catch {
+    // If sharp fails (e.g. unsupported format), use original bytes
+    compressed = Buffer.from(bytes);
+  }
+
+  // Vercel Blob (cloud) or local filesystem
   if (process.env.BLOB_READ_WRITE_TOKEN) {
     const { createRequire } = await import("module");
-    const req = createRequire(import.meta.url);
+    const r = createRequire(import.meta.url);
     const blobModuleName = ["@vercel", "blob"].join("/");
-    const { put } = req(blobModuleName) as typeof import("@vercel/blob");
-    const blob = await put(`${folder}/${safeName}`, file, { access: "public" });
+    const { put } = r(blobModuleName) as typeof import("@vercel/blob");
+    const blob = await put(`${folder}/${safeName}`, compressed, { access: "public", contentType: "image/jpeg" });
     return NextResponse.json({ url: blob.url });
   }
 
@@ -43,7 +57,6 @@ export async function POST(req: NextRequest) {
   const path = await import("path");
   const uploadDir = path.join(process.cwd(), "public", folder);
   await mkdir(uploadDir, { recursive: true });
-  const bytes = new Uint8Array(await file.arrayBuffer());
-  await writeFile(path.join(uploadDir, safeName), bytes);
+  await writeFile(path.join(uploadDir, safeName), compressed);
   return NextResponse.json({ url: `/${folder}/${safeName}` });
 }
