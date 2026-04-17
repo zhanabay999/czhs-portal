@@ -90,7 +90,6 @@ function LeaderCard({
     >
       <div className={`relative ${s.photo} shrink-0 overflow-hidden rounded-full ${borderClass} transition-all duration-500 ${onClick ? "group-hover:scale-105" : ""}`}>
         {leader.photoUrl ? (
-          {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src={leader.photoUrl} alt={isKk ? leader.nameKk : leader.nameRu} className="absolute inset-0 h-full w-full object-cover" style={{ objectPosition: leader.photoPosition || "50% 20%" }} />
         ) : (
           <div className="flex h-full w-full items-center justify-center bg-ktz-blue/10">
